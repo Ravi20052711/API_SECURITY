@@ -1,0 +1,58 @@
+{
+  "project_name": "hacktheapi-cyberlabs",
+  "base_port": 8100,
+  "exercises": [
+    {
+      "exercise_id": "ex-bola-01",
+      "title": "Broken Object Level Authorization (API1:2023)",
+      "container_name": "hacktheapi_ex_bola_01",
+      "image": "hacktheapi/ex-bola-01:latest",
+      "port": 8101,
+      "internal_port": 8000,
+      "environment": {
+        "EXERCISE_ID": "ex-bola-01",
+        "OWASP_CATEGORY": "API1:2023",
+        "ENV": "production"
+      }
+    },
+    {
+      "exercise_id": "ex-bfla-01",
+      "title": "Broken Authentication (API2:2023)",
+      "container_name": "hacktheapi_ex_bfla_01",
+      "image": "hacktheapi/ex-bfla-01:latest",
+      "port": 8102,
+      "internal_port": 8000,
+      "environment": {
+        "EXERCISE_ID": "ex-bfla-01",
+        "OWASP_CATEGORY": "API2:2023",
+        "ENV": "production"
+      }
+    },
+    {
+      "exercise_id": "ex-mass-01",
+      "title": "Broken Object Property Authorization (API3:2023)",
+      "container_name": "hacktheapi_ex_mass_01",
+      "image": "hacktheapi/ex-mass-01:latest",
+      "port": 8103,
+      "internal_port": 8000,
+      "environment": {
+        "EXERCISE_ID": "ex-mass-01",
+        "OWASP_CATEGORY": "API3:2023",
+        "ENV": "production"
+      }
+    },
+    {
+      "exercise_id": "ex-ssrf-01",
+      "title": "Server Side Request Forgery (API7:2023)",
+      "container_name": "hacktheapi_ex_ssrf_01",
+      "image": "hacktheapi/ex-ssrf-01:latest",
+      "port": 8104,
+      "internal_port": 8000,
+      "environment": {
+        "EXERCISE_ID": "ex-ssrf-01",
+        "OWASP_CATEGORY": "API7:2023",
+        "ENV": "production"
+      }
+    }
+  ]
+}

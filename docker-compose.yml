@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # 1. Django REST Backend API Service
+  backend:
+    container_name: hacktheapi_backend
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - OLLAMA_HOST=http://ollama:11434
+    volumes:
+      - ./server:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    networks:
+      - hacktheapi_net
+
+  # 2. Production React Frontend Nginx Service
+  frontend:
+    container_name: hacktheapi_frontend
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3009:3009"
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - hacktheapi_net
+
+  # 3. Integrated Native Ollama AI Model Engine Service
+  ollama:
+    image: ollama/ollama:latest
+    container_name: hacktheapi_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - hacktheapi_net
+
+  # 4. Exercise 1: BOLA (API1:2023)
+  ex-bola-01:
+    container_name: hacktheapi_ex_bola_01
+    build:
+      context: .
+      dockerfile: docker/exercises/ex-bola-01/Dockerfile
+    ports:
+      - "8101:8000"
+    environment:
+      - EXERCISE_ID=ex-bola-01
+      - OWASP_CATEGORY=API1:2023
+    restart: unless-stopped
+    networks:
+      - hacktheapi_net
+
+  # 5. Exercise 2: BFLA (API2:2023)
+  ex-bfla-01:
+    container_name: hacktheapi_ex_bfla_01
+    build:
+      context: .
+      dockerfile: docker/exercises/ex-bfla-01/Dockerfile
+    ports:
+      - "8102:8000"
+    environment:
+      - EXERCISE_ID=ex-bfla-01
+      - OWASP_CATEGORY=API2:2023
+    restart: unless-stopped
+    networks:
+      - hacktheapi_net
+
+  # 6. Exercise 3: Mass Assignment (API3:2023)
+  ex-mass-01:
+    container_name: hacktheapi_ex_mass_01
+    build:
+      context: .
+      dockerfile: docker/exercises/ex-mass-01/Dockerfile
+    ports:
+      - "8103:8000"
+    environment:
+      - EXERCISE_ID=ex-mass-01
+      - OWASP_CATEGORY=API3:2023
+    restart: unless-stopped
+    networks:
+      - hacktheapi_net
+
+  # 7. Exercise 4: SSRF (API7:2023)
+  ex-ssrf-01:
+    container_name: hacktheapi_ex_ssrf_01
+    build:
+      context: .
+      dockerfile: docker/exercises/ex-ssrf-01/Dockerfile
+    ports:
+      - "8104:8000"
+    environment:
+      - EXERCISE_ID=ex-ssrf-01
+      - OWASP_CATEGORY=API7:2023
+    restart: unless-stopped
+    networks:
+      - hacktheapi_net
+
+volumes:
+  ollama_data:
+
+networks:
+  hacktheapi_net:
+    driver: bridge
