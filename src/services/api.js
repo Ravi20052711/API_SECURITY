@@ -1,6 +1,16 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    // If running under Nginx (port 3009) or HTTPS live public tunnel, route through relative /api/v1 gateway
+    if (window.location.port === '3009' || window.location.protocol === 'https:' || !window.location.hostname.includes('localhost')) {
+      return '/api/v1';
+    }
+  }
+  return 'http://localhost:8000/api/v1';
+};
+
+const API_BASE_URL = getBaseUrl();
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -39,11 +49,25 @@ export const authApi = {
     }
     return res.data;
   },
-  signup: async (username, email, password) => {
-    const res = await apiClient.post('/auth/signup', { username, email, password });
+  signup: async (signupData, emailInput, passwordInput) => {
+    let payload = {};
+    if (typeof signupData === 'object' && signupData !== null) {
+      payload = signupData;
+    } else {
+      payload = {
+        username: signupData || emailInput,
+        email: emailInput || signupData,
+        password: passwordInput,
+        role: 'student'
+      };
+    }
+    const res = await apiClient.post('/auth/signup', payload);
     if (res.data.token) {
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('access_token', res.data.token);
+      if (res.data.user) {
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+      }
     }
     return res.data;
   },
@@ -51,8 +75,8 @@ export const authApi = {
     const res = await apiClient.post('/auth/forgot-password', { email: identifier });
     return res.data;
   },
-  resetPasswordConfirm: async (token, new_password) => {
-    const res = await apiClient.post('/auth/reset-password/confirm', { token, new_password });
+  resetPasswordConfirm: async (token, new_password, email) => {
+    const res = await apiClient.post('/auth/reset-password/confirm', { token, new_password, email });
     return res.data;
   },
   logout: () => {
@@ -83,8 +107,12 @@ export const adminAuth = {
 };
 
 export const exerciseApi = {
+  getCatalog: async () => {
+    const res = await apiClient.get(`/exercises/catalog?_t=${Date.now()}`);
+    return res.data;
+  },
   getModules: async () => {
-    const res = await apiClient.get('/exercises/modules');
+    const res = await apiClient.get(`/exercises/catalog?_t=${Date.now()}`);
     return res.data;
   },
   getModuleDetail: async (moduleId) => {
@@ -124,7 +152,7 @@ export const exerciseApi = {
     const d = res.data;
     return {
       completed_count: d.stats?.completed_count || 0,
-      total_exercises: d.stats?.total_exercises || 5,
+      total_exercises: d.stats?.total_exercises || 12,
       completion_rate: d.stats?.completion_rate || 0,
       total_score: d.stats?.total_score || 0,
       items: d.progress_items || []
@@ -194,67 +222,19 @@ export const adminApi = {
     const res = await apiClient.post(`/admin-console/users/${userId}/nullify-password`);
     return res.data;
   },
-  createStaff: async (username, role, password) => {
-    const res = await apiClient.post('/admin-console/staff', { username, role, password });
-    return res.data;
-  },
-  createCourse: async (courseData) => {
-    const res = await apiClient.post('/admin-console/courses', courseData);
-    return res.data;
-  },
-  getCourses: async () => {
-    const res = await apiClient.get('/admin-console/courses');
-    return res.data;
-  },
-  getSecurityEvents: async () => {
-    const res = await apiClient.get('/admin-console/security-events');
-    return res.data;
-  },
-  getCohorts: async () => {
-    const res = await apiClient.get('/admin-console/cohorts');
-    return res.data;
-  },
-  createCohort: async (name, description) => {
-    const res = await apiClient.post('/admin-console/cohorts', { name, description });
-    return res.data;
-  },
-  deployCohortSet: async (cohortId, exerciseSet) => {
-    const res = await apiClient.post(`/admin-console/cohorts/${cohortId}/deploy`, { exercise_set: exerciseSet });
-    return res.data;
-  },
-  getValidationQueue: async () => {
-    const res = await apiClient.get('/admin-console/validation-queue');
-    return res.data;
-  },
-  approveValidation: async (submissionId) => {
-    const res = await apiClient.post('/admin-console/validation-queue', { submission_id: submissionId });
-    return res.data;
-  },
-  getGuardrails: async () => {
-    const res = await apiClient.get('/admin-console/guardrails');
-    return res.data;
-  },
-  runGuardrail: async (testId) => {
-    const res = await apiClient.post('/admin-console/guardrails/run', { test_id: testId });
+  getSecurityLogs: async () => {
+    const res = await apiClient.get('/admin-console/security-logs');
     return res.data;
   }
 };
 
 export const aiApi = {
   getGreeting: async () => {
-    const res = await apiClient.post('/ai/greeting');
+    const res = await apiClient.get('/ai/greeting');
     return res.data;
   },
   sendMessage: async (message) => {
     const res = await apiClient.post('/ai/chat', { message });
-    return res.data;
-  },
-  getHistory: async () => {
-    const res = await apiClient.get('/ai/history');
-    return res.data;
-  },
-  getHealth: async () => {
-    const res = await apiClient.get('/ai/health');
     return res.data;
   }
 };

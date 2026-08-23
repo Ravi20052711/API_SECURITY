@@ -5,183 +5,149 @@ export const USER_ROLES = {
 };
 
 export const MODULE_CATEGORIES = [
-  { id: 'bola', name: 'BOLA (Broken Object Level Authorization)', owasp: 'API1:2023', count: 4 },
-  { id: 'auth', name: 'Broken Authentication', owasp: 'API2:2023', count: 3 },
-  { id: 'property', name: 'Broken Property Level Authorization', owasp: 'API3:2023', count: 3 },
-  { id: 'resource', name: 'Unrestricted Resource Consumption', owasp: 'API4:2023', count: 2 },
-  { id: 'bfla', name: 'BFLA (Broken Function Level Authorization)', owasp: 'API5:2023', count: 4 },
-  { id: 'business_flow', name: 'Sensitive Business Flow Abuse', owasp: 'API6:2023', count: 2 },
-  { id: 'ssrf', name: 'Server Side Request Forgery (SSRF)', owasp: 'API7:2023', count: 3 },
-  { id: 'misconfig', name: 'Security Misconfiguration', owasp: 'API8:2023', count: 2 },
-  { id: 'inventory', name: 'Improper Inventory Management', owasp: 'API9:2023', count: 2 },
-  { id: 'unsafe_consumption', name: 'Unsafe Consumption of APIs', owasp: 'API10:2023', count: 2 }
+  { id: 'all', name: 'All Modules', owasp: 'OWASP TOP 10', count: 12 },
+  { id: 'bola', name: 'Broken Object Level Authorization', owasp: 'API1:2023', count: 1 },
+  { id: 'auth', name: 'Broken Authentication', owasp: 'API2:2023', count: 2 },
+  { id: 'property', name: 'Broken Property Level Authorization', owasp: 'API3:2023', count: 2 },
+  { id: 'resource', name: 'Unrestricted Resource Consumption', owasp: 'API4:2023', count: 1 },
+  { id: 'bfla', name: 'Broken Function Level Authorization', owasp: 'API5:2023', count: 2 },
+  { id: 'ssrf', name: 'Server Side Request Forgery (SSRF)', owasp: 'API7:2023', count: 1 },
+  { id: 'misconfig', name: 'Security Misconfiguration', owasp: 'API8:2023', count: 3 },
+  { id: 'inventory', name: 'Improper Assets Management', owasp: 'API9:2023', count: 1 },
+  { id: 'unsafe_consumption', name: 'Unsafe Consumption of APIs', owasp: 'API10:2023', count: 1 }
 ];
 
 export const EXERCISES = [
   {
-    id: 'ex-bola-01',
-    title: 'BOLA: Cross-Tenant Asset Theft',
-    category: 'bola',
-    owasp: 'API1:2023',
-    difficulty: 'Beginner',
-    estimatedTime: '15 min',
-    status: 'in_progress',
-    scenario: 'Tenant "tenant-alpha" operates an isolated telemetry node. The REST endpoint /api/v1/tenants/{tenant_id}/assets/{asset_id} retrieves asset details. The backend accepts tenant and asset IDs from the path without validating ownership against the authenticated JWT token claims.',
-    objective: 'Verify whether an attacker authenticated under "tenant-alpha" can read confidential asset metadata belonging to "tenant-beta" (Asset ID: AST-9021).',
-    boundary: 'Authorized only against local synthetic container target "FIX-BOLA-2026". No production access.',
-    steps: [
-      { id: 1, text: 'Inspect user auth token and path parameters', completed: true },
-      { id: 2, text: 'Change target asset ID to AST-9021 (belonging to tenant-beta)', completed: false },
-      { id: 3, text: 'Send GET request and verify unauthorized payload extraction', completed: false }
-    ],
-    hints: [
-      { id: 1, title: 'Inspect Resource Identifiers', text: 'Look closely at the request path: /tenants/tenant-beta/assets/AST-9021. Notice that your auth token belongs to tenant-alpha.', penalty: 5 },
-      { id: 2, title: 'Header vs Path Discrepancy', text: 'Try changing the X-Tenant-ID header to "tenant-alpha" while requesting "tenant-beta" in the URI.', penalty: 10 },
-      { id: 3, title: 'Expected Payload', text: 'If successful, the backend will return HTTP 200 with tenant-beta asset payload.', penalty: 15 }
-    ],
-    presetRequest: {
-      method: 'GET',
-      path: '/api/v1/tenants/tenant-beta/assets/AST-9021',
-      headers: {
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.tenant_alpha_token',
-        'X-Tenant-ID': 'tenant-alpha',
-        'Accept': 'application/json'
-      },
-      body: ''
-    },
-    mockResponse: {
-      status: 200,
-      statusText: 'OK',
-      responseTime: '42ms',
-      headers: {
-        'content-type': 'application/json',
-        'x-oracle-eval': 'VERIFIED_EXPLOIT_MATCH'
-      },
-      body: {
-        'asset_id': 'AST-9021',
-        'owner_tenant': 'tenant-beta',
-        'confidential_data': {
-          'kms_alias': 'kms/tenant-beta-prod',
-          'firmware_sha': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-          'network_segment': '10.240.12.0/24'
-        },
-        'vulnerability_flag': 'BOLA_EXPLOITED_SUCCESS'
-      }
-    }
+    id: 'ex-bfla-01',
+    title: 'Lab: Exploiting an API endpoint using documentation (BFLA)',
+    category: 'bfla',
+    owasp: 'API2:2023',
+    difficulty: 'Apprentice',
+    estimatedTime: '20 min',
+    status: 'available',
+    scenario: 'This application exposes an administrative API endpoint without proper authorization checks. Exposed interactive API documentation reveals the undocumented user deletion operation.',
+    objective: 'Discover the exposed API documentation endpoint (/api/v1/docs), identify the unprotected user deletion operation, and delete user carlos.'
   },
   {
-    id: 'ex-bfla-01',
-    title: 'BFLA: Admin Key Revocation',
-    category: 'bfla',
-    owasp: 'API5:2023',
+    id: 'ex-bola-01',
+    title: 'Lab: Broken Object Level Authorization (IDOR)',
+    category: 'bola',
+    owasp: 'API1:2023',
     difficulty: 'Intermediate',
     estimatedTime: '20 min',
     status: 'available',
-    scenario: 'An administrative endpoint /api/v1/admin/access-keys/revoke is exposed under the API gateway. The handler fails to check if the caller possesses role: admin.',
-    objective: 'Demonstrate that a standard user role can invoke administrative key revocation on system accounts.',
-    boundary: 'Authorized against fixture FIX-BFLA-102.',
-    steps: [
-      { id: 1, text: 'Identify administrative endpoint path', completed: false },
-      { id: 2, text: 'Craft POST body payload targeting system admin key ID', completed: false }
-    ],
-    hints: [
-      { id: 1, title: 'Endpoint Discovery', text: 'Examine administrative paths exposed without RBAC middleware.', penalty: 5 }
-    ],
-    presetRequest: {
-      method: 'POST',
-      path: '/api/v1/admin/access-keys/revoke',
-      headers: {
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.standard_user_token',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ target_key_id: 'KEY-SYS-ADMIN-01' }, null, 2)
-    },
-    mockResponse: {
-      status: 200,
-      statusText: 'OK',
-      responseTime: '38ms',
-      headers: { 'content-type': 'application/json' },
-      body: { status: 'REVOKED', key_id: 'KEY-SYS-ADMIN-01', bfla_flag: 'EXPLOIT_VERIFIED' }
-    }
+    scenario: 'You are authenticated as normal user wiener (userId: 1001). The application exposes GET /api/v1/users/{userId}/invoices to retrieve invoice records without authorization checks.',
+    objective: 'Identify and exploit the BOLA flaw to access confidential invoice record INV-888 belonging to target user carlos.'
   },
   {
     id: 'ex-mass-01',
-    title: 'Mass Assignment: Role Injection',
+    title: 'Lab: Mass Assignment / Property Authorization Bypass',
     category: 'property',
     owasp: 'API3:2023',
     difficulty: 'Intermediate',
     estimatedTime: '20 min',
     status: 'available',
-    scenario: 'Updating profile data via PUT /api/v1/users/self automatically binds JSON keys directly to internal DB model fields without filtering sensitive properties.',
-    objective: 'Inject payload property "role": "platform_admin" during self-profile update.',
-    boundary: 'Target FIX-MASS-04.',
-    steps: [
-      { id: 1, text: 'Add property "role": "platform_admin" to PUT payload', completed: false }
-    ],
-    hints: [
-      { id: 1, title: 'Inspect DTO binding', text: 'Pass additional JSON attributes in the body payload.', penalty: 5 }
-    ],
-    presetRequest: {
-      method: 'PUT',
-      path: '/api/v1/users/self',
-      headers: {
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.user_token',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ name: 'Jane Learner', role: 'platform_admin' }, null, 2)
-    },
-    mockResponse: {
-      status: 200,
-      statusText: 'OK',
-      responseTime: '30ms',
-      headers: { 'content-type': 'application/json' },
-      body: { user_id: 'USR-99', role: 'platform_admin', mass_assignment_flag: 'SUCCESS' }
-    }
+    scenario: 'The profile API endpoint PATCH /api/v1/users/me allows email updates but automatically binds JSON parameters directly to the database without field filtering.',
+    objective: 'Craft a PATCH request containing "role": "administrator" to elevate user wiener to administrator privileges.'
+  },
+  {
+    id: 'ex-rate-01',
+    title: 'Lab: Unrestricted Resource Consumption (OTP Brute Force)',
+    category: 'resource',
+    owasp: 'API4:2023',
+    difficulty: 'Intermediate',
+    estimatedTime: '20 min',
+    status: 'available',
+    scenario: 'The password reset endpoint POST /api/v1/auth/reset-otp accepts a 4-digit numeric OTP without rate limiting headers or IP throttling.',
+    objective: 'Brute-force the 4-digit verification OTP (target code: 8841) to trigger a valid password reset token for victim user carlos.'
   },
   {
     id: 'ex-ssrf-01',
-    title: 'SSRF: Internal Metadata Service Leak',
+    title: 'Lab: Server-Side Request Forgery in Avatar Fetcher',
     category: 'ssrf',
     owasp: 'API7:2023',
     difficulty: 'Advanced',
-    estimatedTime: '25 min',
+    estimatedTime: '20 min',
     status: 'available',
-    scenario: 'The webhook notification preview route /api/v1/webhooks/preview accepts an arbitrary URL parameter and fetches it server-side without restricting internal loopback IPs.',
-    objective: 'Extract cloud instance IAM credentials via http://169.254.169.254/latest/meta-data/iam/security-credentials/.',
-    boundary: 'Target FIX-SSRF-99.',
-    steps: [
-      { id: 1, text: 'Pass internal cloud metadata URL to webhook parameter', completed: false }
-    ],
-    hints: [
-      { id: 1, title: 'Metadata URL', text: 'Use AWS/GCP internal metadata IP endpoints.', penalty: 10 }
-    ],
-    presetRequest: {
-      method: 'POST',
-      path: '/api/v1/webhooks/preview',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: 'http://169.254.169.254/latest/meta-data/iam/security-credentials/' }, null, 2)
-    },
-    mockResponse: {
-      status: 200,
-      statusText: 'OK',
-      responseTime: '110ms',
-      headers: { 'content-type': 'application/json' },
-      body: { AccessKeyId: 'ASIAIOSFODNN7EXAMPLE', SecretAccessKey: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY' }
-    }
+    scenario: 'The application provides POST /api/v1/fetch-avatar that accepts external image URLs but fails to restrict internal IP addresses.',
+    objective: 'Coerce the server to make an internal HTTP GET request to http://169.254.169.254 to extract internal AWS cloud IAM credentials.'
+  },
+  {
+    id: 'ex-jwt-01',
+    title: 'Lab: JWT Unsigned Algorithm Authentication Bypass',
+    category: 'auth',
+    owasp: 'API8:2023',
+    difficulty: 'Intermediate',
+    estimatedTime: '20 min',
+    status: 'available',
+    scenario: 'The application authenticates API requests using JWT bearer tokens. However, the JWT verification engine accepts tokens with "alg": "none".',
+    objective: 'Forge a JWT token for user carlos with "alg": "none", strip the signature, and access the restricted GET /api/v1/admin/flag.'
+  },
+  {
+    id: 'ex-sqli-01',
+    title: 'Lab: SQL Injection in User Search API',
+    category: 'misconfig',
+    owasp: 'API8:2023',
+    difficulty: 'Intermediate',
+    estimatedTime: '20 min',
+    status: 'available',
+    scenario: 'The user search directory GET /api/v1/users/search?q= concatenates user inputs directly into an unparsed SQL query string.',
+    objective: 'Inject SQL query payload \' OR \'1\'=\'1 into parameter q to extract all hidden administrator profiles from the database.'
+  },
+  {
+    id: 'ex-cors-01',
+    title: 'Lab: Arbitrary Origin CORS Exploitation',
+    category: 'misconfig',
+    owasp: 'API8:2023',
+    difficulty: 'Intermediate',
+    estimatedTime: '20 min',
+    status: 'available',
+    scenario: 'The user token endpoint GET /api/v1/user/sensitive-token reflects whatever Origin header is sent by the client with credentials enabled.',
+    objective: 'Send a request with Origin: https://attacker.com to exfiltrate the secret administrative token.'
+  },
+  {
+    id: 'ex-cmdi-01',
+    title: 'Lab: OS Command Injection in PDF Exporter',
+    category: 'unsafe_consumption',
+    owasp: 'API10:2023',
+    difficulty: 'Advanced',
+    estimatedTime: '20 min',
+    status: 'available',
+    scenario: 'The report generator endpoint POST /api/v1/export/pdf takes a filename string and passes it directly to a system shell execution call.',
+    objective: 'Inject command payload ; cat /etc/passwd into the filename field to exfiltrate system account details.'
+  },
+  {
+    id: 'ex-xxe-01',
+    title: 'Lab: XML External Entity (XXE) Injection in API Parser',
+    category: 'bfla',
+    owasp: 'API5:2023',
+    difficulty: 'Advanced',
+    estimatedTime: '20 min',
+    status: 'available',
+    scenario: 'The XML configuration endpoint POST /api/v1/xml/parse parses user-supplied XML data with external entity resolution enabled.',
+    objective: 'Submit an XML payload declaring external entity SYSTEM "file:///etc/passwd" to retrieve system credentials.'
+  },
+  {
+    id: 'ex-nosql-01',
+    title: 'Lab: NoSQL Injection Authentication Bypass',
+    category: 'property',
+    owasp: 'API3:2023',
+    difficulty: 'Intermediate',
+    estimatedTime: '20 min',
+    status: 'available',
+    scenario: 'The authentication endpoint POST /api/v1/auth/login parses JSON parameters directly into a MongoDB query dictionary without type checking.',
+    objective: 'Submit password object {"$ne": null} to log in as administrator without knowing the secret password.'
+  },
+  {
+    id: 'ex-graphql-01',
+    title: 'Lab: GraphQL Introspection & Field Disclosure',
+    category: 'inventory',
+    owasp: 'API9:2023',
+    difficulty: 'Apprentice',
+    estimatedTime: '20 min',
+    status: 'available',
+    scenario: 'The endpoint POST /graphql has introspection enabled in production, exposing unpublished administrative schema definitions.',
+    objective: 'Query __schema { types { name } } via GraphQL to discover the hidden secret admin field.'
   }
-];
-
-export const KPI_METRICS = [
-  { id: 'KPI-1', name: 'Technique Transfer Score', score: '84/100', target: '>= 80', status: 'PASS', context: '+6 pts vs O2 baseline' },
-  { id: 'KPI-2', name: 'Exercise Completion Rate', score: '88/100', target: '>= 80', status: 'PASS', context: '+8 pts vs O2 baseline' },
-  { id: 'KPI-3', name: 'Realism Assessment Rating', score: '86/100', target: '>= 80', status: 'PASS', context: 'Evaluated by 2 raters' },
-  { id: 'KPI-4', name: 'Unsafe Outcome Count', score: '0', target: '== 0', status: 'PASS', context: 'Zero security excursions' },
-  { id: 'KPI-5', name: 'Attack Path Detection Rate', score: '94.2%', target: '>= 94%', status: 'PASS', context: '+3.2% vs O2 baseline' },
-  { id: 'KPI-6', name: 'False Positive Rate', score: '1.8%', target: '<= 2.4%', status: 'OPTIMAL', context: '0.6x O2 baseline' }
-];
-
-export const TRANSFER_TARGETS = [
-  { id: 'tgt-med-01', name: 'HealthCare EHR API Target', domain: 'Medical Records', difficulty: 'Advanced', status: 'Unlocked' },
-  { id: 'tgt-fin-02', name: 'FinTech Payment Gateway API', domain: 'Financial Services', difficulty: 'Advanced', status: 'Locked' },
-  { id: 'tgt-log-03', name: 'Logistics Telemetry Network', domain: 'Supply Chain', difficulty: 'Intermediate', status: 'Locked' }
 ];

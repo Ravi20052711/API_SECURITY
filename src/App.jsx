@@ -36,12 +36,15 @@ export default function App() {
   useEffect(() => {
     if (currentUser) {
       localStorage.setItem('user_profile', JSON.stringify(currentUser));
+      localStorage.setItem('user', JSON.stringify(currentUser));
     }
   }, [currentUser]);
 
   const basePath = currentPath.split('?')[0];
   const publicPaths = ['/', '/login', '/signup', '/reset-password'];
-  const isAuthenticated = Boolean(currentUser && (localStorage.getItem('token') || localStorage.getItem('access_token') || currentUser.email));
+  
+  const hasToken = Boolean(localStorage.getItem('token') || localStorage.getItem('access_token') || localStorage.getItem('admin_token'));
+  const isAuthenticated = Boolean(currentUser || hasToken);
 
   useEffect(() => {
     if (!isAuthenticated && !publicPaths.includes(basePath)) {
@@ -95,43 +98,43 @@ export default function App() {
           <ResetPasswordPage navigate={navigate} />
         )}
 
-        {basePath === '/dashboard' && isAuthenticated && (
+        {(basePath === '/dashboard' || (basePath === '/' && isAuthenticated)) && (
           <DashboardPage navigate={navigate} />
         )}
 
-        {basePath === '/modules' && isAuthenticated && (
+        {basePath === '/modules' && (
           <ModulesPage navigate={navigate} />
         )}
 
-        {isExerciseRoute && isAuthenticated && (
+        {isExerciseRoute && (
           <ExercisePage navigate={navigate} key={currentPath} />
         )}
 
-        {basePath === '/assessment' && isAuthenticated && (
+        {basePath === '/assessment' && (
           <AssessmentPage navigate={navigate} />
         )}
 
-        {basePath === '/instructor' && isAuthenticated && (
+        {basePath === '/instructor' && (
           <InstructorPortalPage navigate={navigate} />
         )}
 
-        {basePath === '/assessor' && isAuthenticated && (
+        {basePath === '/assessor' && (
           <AssessorPortalPage navigate={navigate} />
         )}
 
-        {(basePath === '/admin-portal' || basePath === '/admin') && isAuthenticated && (
+        {(basePath === '/admin-portal' || basePath === '/admin') && (
           <AdminPortalPage navigate={navigate} />
         )}
 
-        {basePath === '/progress' && isAuthenticated && (
+        {basePath === '/progress' && (
           <ProgressPage navigate={navigate} />
         )}
 
-        {basePath === '/docs' && isAuthenticated && (
+        {basePath === '/docs' && (
           <DocsPage navigate={navigate} />
         )}
 
-        {basePath === '/settings' && isAuthenticated && (
+        {basePath === '/settings' && (
           <SettingsPage currentUser={currentUser} navigate={navigate} />
         )}
 

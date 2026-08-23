@@ -86,6 +86,18 @@ body::before {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  transition: padding-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Dynamic Flexible Page Reflow when AI Sidebar is Active */
+body.ai-sidebar-open #root {
+  padding-right: 420px;
+}
+
+@media (max-width: 900px) {
+  body.ai-sidebar-open #root {
+    padding-right: 0 !important;
+  }
 }
 
 .mono {
@@ -101,144 +113,181 @@ body::before {
   font-weight: 700;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  text-align: center;
-  padding: 7px 12px;
+  padding: 6px 16px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify: center;
   gap: 8px;
+  z-index: 100;
 }
 
-/* Card Container */
-.tech-card {
-  background: var(--bg-surface-1);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  position: relative;
-  overflow: hidden;
-  transition: all 0.15s ease;
-}
-.tech-card:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+/* Main Container Layout */
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  width: 100%;
 }
 
-/* Primary Navy Buttons matching reference image */
+/* Primary Button Styling */
 .tech-btn {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 700;
-  padding: 10px 18px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--brand-navy);
-  background: var(--brand-navy);
-  color: #ffffff;
   cursor: pointer;
+  border: none;
   transition: all 0.15s ease;
-  text-decoration: none;
-}
-.tech-btn:hover {
-  background: var(--brand-navy-hover);
-  border-color: var(--brand-navy-hover);
+  outline: none;
 }
 
 .tech-btn-primary {
-  background: var(--brand-navy);
-  border-color: var(--brand-navy);
-  color: #ffffff;
-}
-.tech-btn-primary:hover {
-  background: var(--brand-navy-hover);
+  background-color: var(--brand-navy);
+  color: var(--text-inverse);
 }
 
-.tech-btn-secondary {
-  border-color: var(--border-tech);
-  background: #ffffff;
-  color: var(--text-primary);
-}
-.tech-btn-secondary:hover {
-  border-color: var(--brand-navy);
-  background: var(--bg-surface-2);
+.tech-btn-primary:hover {
+  background-color: var(--brand-navy-hover);
+  box-shadow: 0 4px 12px rgba(27, 20, 100, 0.25);
 }
 
 .tech-btn-amber {
-  border-color: var(--brand-orange);
-  background: var(--brand-orange);
+  background-color: var(--brand-orange);
   color: #ffffff;
 }
+
 .tech-btn-amber:hover {
-  background: var(--brand-orange-hover);
+  background-color: var(--brand-orange-hover);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
 }
 
-.tech-btn-sm {
-  padding: 6px 12px;
-  font-size: 12px;
+.tech-btn-secondary {
+  background-color: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.tech-btn-secondary:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
 }
 
 /* Badges */
 .tech-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 4px;
-  text-transform: uppercase;
-}
-.badge-cyan { color: var(--badge-beginner-text); background: var(--badge-beginner-bg); }
-.badge-teal { color: var(--badge-beginner-text); background: var(--badge-beginner-bg); }
-.badge-amber { color: var(--badge-intermediate-text); background: var(--badge-intermediate-bg); }
-.badge-red { color: var(--badge-advanced-text); background: var(--badge-advanced-bg); }
-.badge-green { color: var(--badge-completed-text); background: var(--badge-completed-bg); }
-.badge-muted { color: var(--text-muted); background: var(--bg-surface-2); }
-
-/* Header Navigation Bar matching reference image */
-.sys-header {
-  height: var(--header-height);
-  background: #ffffff;
-  border-bottom: 1px solid var(--border-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.sys-logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-sans);
-  font-size: 18px;
-  font-weight: 900;
-  color: var(--text-primary);
-  cursor: pointer;
-  letter-spacing: -0.5px;
-}
-
-.sys-logo-icon {
-  background: var(--brand-navy);
-  color: #ffffff;
   padding: 3px 8px;
-  border-radius: 6px;
-  font-family: var(--font-mono);
-  font-size: 14px;
-  font-weight: 800;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.main-container {
-  flex: 1;
-  max-width: 1400px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 32px 24px;
+.badge-cyan {
+  background-color: var(--badge-beginner-bg);
+  color: var(--badge-beginner-text);
+}
+
+.badge-amber {
+  background-color: var(--badge-intermediate-bg);
+  color: var(--badge-intermediate-text);
+}
+
+.badge-red {
+  background-color: var(--badge-advanced-bg);
+  color: var(--badge-advanced-text);
+}
+
+.badge-green {
+  background-color: var(--badge-completed-bg);
+  color: var(--badge-completed-text);
+}
+
+/* Cards & Containers */
+.tech-card {
+  background: var(--bg-surface-1);
+  border: 1px solid var(--border-tech);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 900px) {
+  .sys-header {
+    padding: 12px 16px;
+  }
+  .desktop-nav {
+    display: none !important;
+  }
+  .mobile-menu-toggle {
+    display: block !important;
+  }
+  .main-container {
+    padding: 16px 12px;
+  }
+  
+  /* Force 3-column & 2-column grids to 1-column on mobile & tablet */
+  section[style*="gridTemplateColumns"],
+  div[style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Responsive typography */
+  h1 {
+    font-size: 32px !important;
+    line-height: 1.15 !important;
+  }
+  h2 {
+    font-size: 22px !important;
+  }
+  
+  /* Overflow handling for tables and code snippets */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  pre {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .sys-logo {
+    font-size: 16px;
+  }
+  .top-env-banner {
+    font-size: 9px;
+    padding: 5px 8px;
+  }
+  .tech-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
 }

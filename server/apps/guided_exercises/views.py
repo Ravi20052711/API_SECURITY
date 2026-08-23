@@ -10,6 +10,7 @@ from .docker_manager import DockerManager, DockerDesktopUnavailableException, Do
 from .postman_exporter import PostmanExporter
 from .lab_manager import LabManager
 from .challenge_registry import ChallengeRegistry
+from .oracle_engine import OracleVerificationEngine
 
 def get_authenticated_user(request):
     """
@@ -122,31 +123,48 @@ class UserProgressView(APIView):
         }, status=status.HTTP_200_OK)
 
     def post(self, request):
+        """
+        STRICT VERIFIED LAB PROGRESS SUBMISSION:
+        Evaluates payload data against OracleVerificationEngine.
+        Labs NEVER pass without real, verified server-side exploitation.
+        """
         auth_user = get_authenticated_user(request)
         user_email = auth_user.email
         exercise_id = request.data.get('exercise_id', 'ex-bfla-01')
-        new_status = request.data.get('status', 'COMPLETED')
-        score = request.data.get('score', 100)
 
-        prog, _ = UserProgress.objects.get_or_create(
-            user_email=user_email,
-            exercise_id=exercise_id
-        )
-        prog.status = new_status
-        prog.score = score
-        if new_status == 'COMPLETED':
+        # Run independent Oracle verification
+        eval_result = OracleVerificationEngine.verify_exploitation(exercise_id, request.data)
+
+        if eval_result.get('verified'):
+            prog, _ = UserProgress.objects.get_or_create(
+                user_email=user_email,
+                exercise_id=exercise_id
+            )
+            prog.status = 'COMPLETED'
+            prog.score = 100
             prog.completed_at = timezone.now()
-        prog.save()
+            prog.save()
 
-        return Response({
-            'status': 'PROGRESS_RECORDED',
-            'user_email': user_email,
-            'exercise_id': exercise_id,
-            'exercise_status': new_status
-        }, status=status.HTTP_200_OK)
+            return Response({
+                'verified': True,
+                'status': 'COMPLETED',
+                'status_code': 200,
+                'score': 100,
+                'message': eval_result.get('message'),
+                'response_data': eval_result
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'verified': False,
+                'status': 'FAIL',
+                'status_code': 400,
+                'score': 0,
+                'message': eval_result.get('message'),
+                'response_data': eval_result
+            }, status=status.HTTP_200_OK)
 
 
-class UserDashboardView(APIView):
+class DashboardMeView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
@@ -230,11 +248,10 @@ class UserDashboardView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+UserDashboardView = DashboardMeView
+
+
 class StartLabView(APIView):
-    """
-    POST /api/v1/labs/:exerciseId/start
-    Pre-flight Docker Desktop health check & controlled exception handling.
-    """
     permission_classes = [permissions.AllowAny]
 
     def post(self, request, exercise_id):

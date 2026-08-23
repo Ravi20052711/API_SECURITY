@@ -29,23 +29,27 @@ class PasswordResetToken(models.Model):
     user_email = models.CharField(max_length=150)
     token_hash = models.CharField(max_length=128, unique=True)
     is_used = models.BooleanField(default=False)
+    failed_attempts = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
 
     @classmethod
     def create_token_for_user(cls, user_email):
+        # Invalidate any old unused tokens for this user
+        cls.objects.filter(user_email=user_email, is_used=False).update(is_used=True)
         raw_token = secrets.token_urlsafe(32)
         hashed = hashlib.sha256(raw_token.encode('utf-8')).hexdigest()
         expires = timezone.now() + timedelta(hours=1)
         cls.objects.create(
             user_email=user_email,
             token_hash=hashed,
-            expires_at=expires
+            expires_at=expires,
+            failed_attempts=0
         )
         return raw_token
 
     def is_valid(self):
-        return not self.is_used and timezone.now() < self.expires_at
+        return not self.is_used and timezone.now() < self.expires_at and self.failed_attempts < 3
 
 
 class RoleChangeEvent(models.Model):
@@ -61,15 +65,14 @@ class RoleChangeEvent(models.Model):
 
 
 class CentralSecurityLog(models.Model):
-    event_id = models.CharField(max_length=64, unique=True)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    event_id = models.CharField(max_length=100, unique=True)
     actor_email = models.CharField(max_length=150)
-    target_resource = models.CharField(max_length=200, blank=True)
-    event_type = models.CharField(max_length=100) # LOGIN_SUCCESS, LOGIN_FAILURE, FORGOT_PASSWORD, NULLIFY_PASSWORD, ROLE_CHANGE, PROGRESS_RESET
-    severity = models.CharField(max_length=20, default='INFO') # INFO, WARNING, CRITICAL
+    target_resource = models.CharField(max_length=255)
+    event_type = models.CharField(max_length=100)
+    severity = models.CharField(max_length=20, default='INFO')
     result = models.CharField(max_length=50, default='SUCCESS')
     details = models.TextField(blank=True)
-    ip_address = models.CharField(max_length=50, blank=True, default='127.0.0.1')
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"[{self.severity}] {self.event_type} by {self.actor_email} at {self.timestamp}"
+        return f"[{self.severity}] {self.event_type} - {self.actor_email}"
