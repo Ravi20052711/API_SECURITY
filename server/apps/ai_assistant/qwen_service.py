@@ -2,53 +2,25 @@ import os
 import json
 import urllib.request
 import logging
-from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
-PLATFORM_KNOWLEDGE_SYSTEM = """
-PLATFORM CONTEXT & LAB KNOWLEDGE SYSTEM (AUTHORITATIVE):
-
-Website & Application Identity:
-- Name: API Security Training Platform (HackTheAPI)
-- Purpose: Hands-on, isolated cybersecurity training platform that teaches OWASP Top 10 API Security vulnerabilities using Docker-provisioned target containers.
-
-EXPLICIT STEP-BY-STEP LAB INSTRUCTIONS:
-
-1. Lab: Broken Function Level Authorization (BFLA - OWASP API2:2023) [ex-bfla-01]:
-   - Step 1: Open the Request Builder or browse http://localhost:8102/api/v1/docs to inspect exposed OpenAPI documentation.
-   - Step 2: Locate the administrative user deletion endpoint: DELETE /api/v1/users/{username}.
-   - Step 3: In Request Builder, set Method to DELETE, endpoint to /api/v1/users/carlos, and click Send Request.
-   - Step 4: Verify 200 OK response and click Validate Lab.
-
-2. Lab: Broken Object Level Authorization (BOLA / IDOR - OWASP API1:2023) [ex-bola-01]:
-   - Step 1: Open Request Builder or browse http://localhost:8101/api/v1/users/me.
-   - Step 2: Identify target user Carlos's ID (1002).
-   - Step 3: In Request Builder, set Method to GET, endpoint to /api/v1/users/1002/invoices, and click Send Request.
-   - Step 4: View Carlos's private invoice data and click Validate Lab.
-
-3. Lab: Mass Assignment / Property Authorization Bypass (OWASP API3:2023) [ex-mass-01]:
-   - Step 1: Set Method to PATCH, endpoint to /api/v1/users/me.
-   - Step 2: In JSON Body, inject property: {"email": "wiener@normal-user.net", "role": "administrator"}.
-   - Step 3: Click Send Request to elevate profile to administrator.
-   - Step 4: Click Validate Lab.
-
-4. Lab: Server-Side Request Forgery (SSRF - OWASP API7:2023) [ex-ssrf-01]:
-   - Step 1: Set Method to POST, endpoint to /api/v1/fetch-avatar.
-   - Step 2: Set JSON Body to: {"url": "http://169.254.169.254/latest/meta-data/iam/security-credentials"}.
-   - Step 3: Click Send Request to extract internal cloud metadata.
-   - Step 4: Click Validate Lab.
-"""
-
 class QwenAIService:
     """
-    Personalized Local Qwen AI Assistant Service.
-    Connects to local Ollama Qwen LLM engine (http://127.0.0.1:11434/api/generate).
-    Provides general knowledge and specialized cybersecurity lab assistance.
+    Real Local Ollama AI Assistant Service.
+    Connects to local Ollama LLM engine (http://127.0.0.1:11434/api/generate or /api/chat).
+    Reads active user progress and entire frontend workbench page context.
     """
 
-    QWEN_URL = os.environ.get('LOCAL_QWEN_URL', 'http://127.0.0.1:11434/api/generate')
-    DEFAULT_MODELS = ['qwen:latest', 'qwen:4b', 'qwen3.5:4b', 'qwen3.5:cloud', 'qwen2.5-coder']
+    OLLAMA_GENERATE_URL = os.environ.get('LOCAL_QWEN_URL', 'http://127.0.0.1:11434/api/generate')
+    OLLAMA_CHAT_URL = 'http://127.0.0.1:11434/api/chat'
+    OLLAMA_TAGS_URL = 'http://127.0.0.1:11434/api/tags'
+
+    PREFERRED_MODELS = [
+        'qwen2.5-coder', 'qwen2.5-coder:latest', 'qwen2.5', 'qwen2.5:latest',
+        'qwen2.5:0.5b', 'qwen2.5:1.5b', 'qwen2.5:7b', 'qwen:latest', 'qwen',
+        'llama3.2', 'llama3', 'mistral', 'gemma', 'codellama'
+    ]
 
     @classmethod
     def determine_experience_level(cls, progress_stats):
@@ -80,58 +52,64 @@ class QwenAIService:
     @classmethod
     def get_active_model(cls):
         try:
-            req = urllib.request.Request("http://127.0.0.1:11434/api/tags", method='GET')
+            req = urllib.request.Request(cls.OLLAMA_TAGS_URL, method='GET')
             with urllib.request.urlopen(req, timeout=3.0) as resp:
                 data = json.loads(resp.read().decode('utf-8'))
-                installed = [m.get('name') for m in data.get('models', [])]
-                for target in cls.DEFAULT_MODELS:
-                    if target in installed:
+                installed_models = [m.get('name') for m in data.get('models', [])]
+                logger.info(f"Ollama installed models: {installed_models}")
+
+                for target in cls.PREFERRED_MODELS:
+                    if target in installed_models:
                         return target
-                if installed:
-                    return installed[0]
-        except Exception:
-            pass
-        return 'qwen:latest'
+                    for m in installed_models:
+                        if target in m:
+                            return m
+
+                if installed_models:
+                    return installed_models[0]
+        except Exception as e:
+            logger.warning(f"Ollama tags lookup notice: {e}")
+
+        return 'qwen2.5-coder'
 
     @classmethod
     def is_qwen_available(cls):
         try:
-            req = urllib.request.Request("http://127.0.0.1:11434/api/tags", method='GET')
+            req = urllib.request.Request(cls.OLLAMA_TAGS_URL, method='GET')
             with urllib.request.urlopen(req, timeout=3.0) as resp:
                 return resp.status == 200
         except Exception:
             return False
 
     @classmethod
-    def _call_qwen(cls, prompt, system_prompt=None):
+    def _call_ollama(cls, prompt, system_prompt=None):
         model_name = cls.get_active_model()
-        full_system_prompt = f"{PLATFORM_KNOWLEDGE_SYSTEM}\n\n{system_prompt or ''}".strip()
 
         payload = {
             "model": model_name,
             "prompt": prompt,
-            "system": full_system_prompt,
+            "system": system_prompt or "",
             "stream": False,
             "options": {
-                "temperature": 0.5,
-                "num_predict": 300
+                "temperature": 0.6,
+                "num_predict": 400
             }
         }
 
         try:
             req = urllib.request.Request(
-                cls.QWEN_URL,
+                cls.OLLAMA_GENERATE_URL,
                 data=json.dumps(payload).encode('utf-8'),
                 headers={'Content-Type': 'application/json'},
                 method='POST'
             )
-            with urllib.request.urlopen(req, timeout=45.0) as resp:
+            with urllib.request.urlopen(req, timeout=60.0) as resp:
                 data = json.loads(resp.read().decode('utf-8'))
                 res_text = data.get('response', '').strip()
                 if res_text:
                     return res_text
         except Exception as e:
-            logger.warning(f"Ollama local Qwen inference notice: {e}")
+            logger.warning(f"Ollama LLM inference error: {e}")
 
         return None
 
@@ -140,49 +118,79 @@ class QwenAIService:
         exp = cls.determine_experience_level(progress_stats)
         not_started = [i for i in items if i['status'] == 'NOT_STARTED']
         in_prog = [i for i in items if i['status'] == 'IN_PROGRESS']
-        next_rec = not_started[0]['title'] if not_started else (in_prog[0]['title'] if in_prog else "Unfamiliar API Assessment")
+        next_rec = not_started[0]['title'] if not_started else (in_prog[0]['title'] if in_prog else "OWASP API Assessment")
 
         system_prompt = (
-            "You are Qwen, a friendly and intelligent AI Learning Assistant on HackTheAPI.\n"
-            f"Greet student {user_name} warmly and encourage them for their next lab: {next_rec}."
+            "You are Qwen AI, a friendly and expert API security tutor on HackTheAPI platform.\n"
+            f"Greet the student {user_name} ({exp['badge']}). Encourage them for their next lab: {next_rec}. Keep it under 2 sentences."
         )
 
-        resp = cls._call_qwen(f"Greet student {user_name}.", system_prompt=system_prompt)
+        resp = cls._call_ollama(f"Greet student {user_name}.", system_prompt=system_prompt)
         if resp:
             return resp
 
-        return f"Welcome back, {user_name}! ({exp['badge']}). You have completed {progress_stats['completed_count']} of {progress_stats['total_exercises']} exercises. Your next recommended exercise is {next_rec}."
+        return f"Welcome back, {user_name}! ({exp['badge']}). You have completed {progress_stats['completed_count']} of {progress_stats['total_exercises']} exercises. Next recommended lab: {next_rec}."
 
     @classmethod
-    def generate_learning_advice(cls, user_name, user_query, progress_stats, items, active_lab=None):
+    def generate_learning_advice(cls, user_name, user_query, progress_stats, items, active_lab=None, page_context=None):
         exp = cls.determine_experience_level(progress_stats)
-        not_started = [i for i in items if i['status'] == 'NOT_STARTED']
-        in_prog = [i for i in items if i['status'] == 'IN_PROGRESS']
+        completed_labs = [i['title'] for i in items if i['status'] == 'COMPLETED']
+        pending_labs = [i['title'] for i in items if i['status'] != 'COMPLETED']
 
-        current_target = active_lab if active_lab else (in_prog[0] if in_prog else (not_started[0] if not_started else None))
-        current_title = current_target.get('title', 'BFLA Lab') if current_target else 'BFLA Lab'
-        current_ex_id = current_target.get('exercise_id', 'ex-bfla-01') if current_target else 'ex-bfla-01'
+        context_lines = []
+        context_lines.append(f"STUDENT ACCOUNT & INTERNAL PROGRESS:")
+        context_lines.append(f"- Student Name: {user_name}")
+        context_lines.append(f"- Experience Tier: {exp['title']} ({exp['badge']})")
+        context_lines.append(f"- Completed Labs Count: {progress_stats['completed_count']} / {progress_stats['total_exercises']} ({progress_stats['completion_rate']}%)")
+        context_lines.append(f"- Total Score: {progress_stats['total_score']} pts")
 
-        system_prompt = (
-            "You are Qwen, a versatile, highly intelligent AI assistant with full general knowledge and cybersecurity expertise.\n"
-            f"You are chatting with student {user_name} on HackTheAPI (Current Active Lab: {current_title}).\n\n"
-            "RESPONSE GUIDELINES:\n"
-            "- If the student asks a general knowledge, anime, science, coding, or casual question (e.g., 'bankai', 'what is python', 'hi'), answer accurately, naturally, and conversationally using your general knowledge.\n"
-            "- If the student asks about API security, OWASP, or how to solve their lab, provide clear, step-by-step technical guidance.\n"
-            "- DO NOT echo prompt templates or system strings."
-        )
+        if completed_labs:
+            context_lines.append(f"- Completed Labs: {', '.join(completed_labs)}")
+        if pending_labs:
+            context_lines.append(f"- Next Pending Labs: {', '.join(pending_labs[:5])}")
 
-        resp = cls._call_qwen(user_query, system_prompt=system_prompt)
+        if active_lab and isinstance(active_lab, dict):
+            context_lines.append(f"- Running Session Lab: {active_lab.get('title')} (ID: {active_lab.get('exercise_id')})")
+
+        # Entire Screen / Page Workbench Context
+        if page_context and isinstance(page_context, dict):
+            context_lines.append("\nENTIRE FRONTEND PAGE & WORKBENCH CONTEXT (CURRENTLY OPEN ON USER SCREEN):")
+            if page_context.get('url'):
+                context_lines.append(f"- Page Route: {page_context['url']}")
+            if page_context.get('exercise_id'):
+                context_lines.append(f"- Exercise ID: {page_context['exercise_id']}")
+            if page_context.get('lab_title'):
+                context_lines.append(f"- Exercise Title: {page_context['lab_title']}")
+            if page_context.get('owasp'):
+                context_lines.append(f"- OWASP Vulnerability Category: {page_context['owasp']}")
+            if page_context.get('scenario'):
+                context_lines.append(f"- Scenario & Problem Description: {page_context['scenario']}")
+            if page_context.get('objective'):
+                context_lines.append(f"- Lab Objective: {page_context['objective']}")
+            if page_context.get('request_method'):
+                context_lines.append(f"- Request Builder Method: {page_context['request_method']}")
+            if page_context.get('request_endpoint'):
+                context_lines.append(f"- Request Builder Endpoint: {page_context['request_endpoint']}")
+            if page_context.get('request_headers'):
+                context_lines.append(f"- Request Builder Headers: {page_context['request_headers']}")
+            if page_context.get('request_body'):
+                context_lines.append(f"- Request Builder Body: {page_context['request_body']}")
+            if page_context.get('last_response_status'):
+                context_lines.append(f"- Last Execution Status Code: {page_context['last_response_status']}")
+            if page_context.get('last_response_output'):
+                context_lines.append(f"- Last Execution Response Output: {str(page_context['last_response_output'])[:400]}")
+
+        system_prompt = f"""You are Qwen AI, an intelligent, versatile AI Assistant integrated into HackTheAPI Cybersecurity Platform.
+
+{"\n".join(context_lines)}
+
+SYSTEM & RESPONSE GUIDELINES:
+1. For general knowledge, geography, anime, science, coding, or general questions (e.g., "where is Germany", "what is python", "hello"), answer accurately, naturally, and conversationally using your full LLM knowledge.
+2. When the user asks "guide me through this", "help me with this lab", or asks about their current lab exercise, inspect the ENTIRE FRONTEND PAGE & WORKBENCH CONTEXT above and provide tailored, step-by-step guidance explaining what parameters to modify and how to achieve the lab objective.
+3. Be encouraging, precise, and concise. Do NOT echo prompt templates or system strings. Speak directly to {user_name}."""
+
+        resp = cls._call_ollama(user_query, system_prompt=system_prompt)
         if resp:
-            cleaned = resp
-            if "Student Name:" in cleaned and "Question:" in cleaned:
-                cleaned = cleaned.split("Provide your AI response.")[-1].strip()
-            return cleaned
+            return resp
 
-        return (
-            f"Here is your step-by-step guide for **{current_title}**:\n"
-            "1. Open the **Request Builder** tab to construct your HTTP request.\n"
-            "2. Inspect API documentation at `/api/v1/docs` to discover exposed endpoints.\n"
-            "3. Send the modified HTTP request to test authorization boundaries.\n"
-            "4. Click **Validate Lab** to record your completion!"
-        )
+        return f"⚠️ Local Ollama AI is currently offline. Please start Ollama on your computer (`ollama run qwen2.5-coder`) to connect your local AI engine."

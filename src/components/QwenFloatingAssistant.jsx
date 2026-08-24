@@ -82,6 +82,35 @@ export default function QwenFloatingAssistant() {
     setChatMessages([]);
   };
 
+  const captureCurrentPageContext = () => {
+    try {
+      const path = window.location.pathname + window.location.search;
+      const context = {
+        url: path,
+        page_title: document.title,
+        timestamp: new Date().toISOString()
+      };
+
+      if (window.location.href.includes('/exercise')) {
+        const urlParams = new URLSearchParams(window.location.search);
+        context.exercise_id = urlParams.get('id') || '';
+
+        if (window.__CURRENT_LAB_WORKBENCH_STATE__) {
+          Object.assign(context, window.__CURRENT_LAB_WORKBENCH_STATE__);
+        } else {
+          const header = document.querySelector('h1, h2, h3');
+          if (header) context.lab_title = header.innerText;
+
+          const cardText = document.querySelector('.tech-card, .scenario-box');
+          if (cardText) context.scenario = cardText.innerText.substring(0, 500);
+        }
+      }
+      return context;
+    } catch {
+      return null;
+    }
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputMessage.trim() || chatLoading) return;
@@ -93,15 +122,17 @@ export default function QwenFloatingAssistant() {
     setChatMessages(updatedMessages);
     setChatLoading(true);
 
+    const pageCtx = captureCurrentPageContext();
+
     try {
-      const res = await aiApi.sendMessage(userText);
+      const res = await aiApi.sendMessage(userText, pageCtx);
       if (res && res.reply) {
         setChatMessages([...updatedMessages, { role: 'assistant', text: res.reply }]);
       } else {
-        setChatMessages([...updatedMessages, { role: 'assistant', text: 'Local Qwen AI service responded.' }]);
+        setChatMessages([...updatedMessages, { role: 'assistant', text: 'Local Ollama AI service responded.' }]);
       }
     } catch {
-      setChatMessages([...updatedMessages, { role: 'assistant', text: 'Here is your quick hint: Open the Request Builder tab, inspect the API endpoint parameters, and test authorization boundaries.' }]);
+      setChatMessages([...updatedMessages, { role: 'assistant', text: '⚠️ Local Ollama AI service is offline. Start Ollama on http://127.0.0.1:11434 (`ollama run qwen2.5-coder`) to connect your local AI.' }]);
     } finally {
       setChatLoading(false);
     }

@@ -1,5 +1,3 @@
-import threading
-import time
 from django.apps import AppConfig
 
 class AIAssistantConfig(AppConfig):
@@ -8,16 +6,7 @@ class AIAssistantConfig(AppConfig):
 
     def ready(self):
         """
-        AUTOMATIC QWEN AI ONLINE ENFORCER:
-        Ensures local Qwen AI service is started and ONLINE every time the project starts.
+        AIAssistant App Initializer.
+        Directly integrates with local Ollama service running on port 11434.
         """
-        def auto_start_qwen():
-            try:
-                from .qwen_local_runner import start_local_qwen_server
-                start_local_qwen_server()
-            except Exception as e:
-                pass
-
-        # Start Qwen local server daemon thread
-        t = threading.Thread(target=auto_start_qwen, daemon=True)
-        t.start()
+        pass

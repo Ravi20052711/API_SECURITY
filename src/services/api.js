@@ -233,8 +233,8 @@ export const aiApi = {
     const res = await apiClient.get('/ai/greeting');
     return res.data;
   },
-  sendMessage: async (message) => {
-    const res = await apiClient.post('/ai/chat', { message });
+  sendMessage: async (message, pageContext = null) => {
+    const res = await apiClient.post('/ai/chat', { message, page_context: pageContext });
     return res.data;
   }
 };

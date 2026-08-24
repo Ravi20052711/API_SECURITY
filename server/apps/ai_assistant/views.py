@@ -75,6 +75,8 @@ class AIChatView(APIView):
         display_name = auth_user.username or auth_user.first_name or user_email.split('@')[0]
 
         message = request.data.get('message', '').strip()
+        page_context = request.data.get('page_context', None)
+
         if not message:
             return Response({'error': 'Message content is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -96,7 +98,10 @@ class AIChatView(APIView):
             }
 
         prog_data = get_user_progress_summary(user_email)
-        reply = QwenAIService.generate_learning_advice(display_name, message, prog_data, prog_data['items'], active_lab=active_lab)
+        reply = QwenAIService.generate_learning_advice(
+            display_name, message, prog_data, prog_data['items'],
+            active_lab=active_lab, page_context=page_context
+        )
 
         UserAIConversation.objects.create(
             user_email=user_email,
@@ -137,5 +142,5 @@ class AIHealthView(APIView):
         return Response({
             'status': 'ONLINE' if available else 'OFFLINE',
             'model': model_name,
-            'url': QwenAIService.QWEN_URL
+            'url': QwenAIService.OLLAMA_GENERATE_URL
         }, status=status.HTTP_200_OK)

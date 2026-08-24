@@ -64,6 +64,23 @@ export default function ExercisePage({ navigate }) {
   };
 
   useEffect(() => {
+    window.__CURRENT_LAB_WORKBENCH_STATE__ = {
+      exercise_id: exerciseId,
+      lab_title: challenge?.title,
+      owasp: challenge?.owasp,
+      scenario: challenge?.problem_statement || challenge?.scenario,
+      objective: challenge?.objective,
+      active_tab: activeTab,
+      request_method: method,
+      request_endpoint: endpoint,
+      request_headers: requestHeaders,
+      request_body: requestBody,
+      last_response_status: responseStatus,
+      last_response_output: responseOutput
+    };
+  }, [exerciseId, challenge, activeTab, method, endpoint, requestHeaders, requestBody, responseStatus, responseOutput]);
+
+  useEffect(() => {
     enforceFullScreen();
     const handleWindowClick = () => enforceFullScreen();
     window.addEventListener('click', handleWindowClick);
