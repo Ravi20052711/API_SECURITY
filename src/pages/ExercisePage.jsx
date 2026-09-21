@@ -8,7 +8,7 @@ export default function ExercisePage({ navigate }) {
     if (saved) {
       try { return JSON.parse(saved); } catch { return null; }
     }
-    return { name: 'wiener', email: 'wiener@normal-user.net' };
+    return null;
   });
 
   // Active Workspace Tab: 'brief' | 'target_app' | 'request_builder' | 'verification'

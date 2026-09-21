@@ -4,11 +4,11 @@ import { exerciseApi, labApi } from '../services/api';
 
 export default function DashboardPage({ navigate }) {
   const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem('user_profile');
+    const saved = localStorage.getItem('user_profile') || localStorage.getItem('user');
     if (saved) {
       try { return JSON.parse(saved); } catch { return null; }
     }
-    return { name: 'Student Hacker', email: 'student@lab.dev' };
+    return null;
   });
 
   const [dashboardData, setDashboardData] = useState({

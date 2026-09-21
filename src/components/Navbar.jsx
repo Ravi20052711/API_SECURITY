@@ -13,18 +13,9 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
     { path: '/progress', label: 'Progress' },
   ];
 
-  if (role === 'instructor' || role === 'admin') {
-    baseLinks.push({ path: '/instructor', label: 'Instructor Portal' });
-  }
-
-  if (role === 'assessor' || role === 'admin') {
-    baseLinks.push({ path: '/assessor', label: 'Assessor Portal' });
-  }
-
-  if (role === 'admin') {
-    baseLinks.push({ path: '/admin-portal', label: 'Admin Portal' });
-  }
-
+  baseLinks.push({ path: '/instructor', label: 'Instructor Portal' });
+  baseLinks.push({ path: '/assessor', label: 'Assessor Portal' });
+  baseLinks.push({ path: '/admin-portal', label: 'Admin Portal' });
   baseLinks.push({ path: '/docs', label: 'Docs' });
 
   const handleNavClick = (targetPath) => {

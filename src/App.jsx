@@ -43,11 +43,15 @@ export default function App() {
   const basePath = currentPath.split('?')[0];
   const publicPaths = ['/', '/login', '/signup', '/reset-password'];
   
-  const hasToken = Boolean(localStorage.getItem('token') || localStorage.getItem('access_token') || localStorage.getItem('admin_token'));
-  const isAuthenticated = Boolean(currentUser || hasToken);
+  const hasToken = Boolean(localStorage.getItem('token') || localStorage.getItem('access_token'));
+  const isAuthenticated = Boolean(currentUser && hasToken);
 
   useEffect(() => {
     if (!isAuthenticated && !publicPaths.includes(basePath)) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user_profile');
+      localStorage.removeItem('user');
       navigate('/login');
     }
   }, [basePath, isAuthenticated]);

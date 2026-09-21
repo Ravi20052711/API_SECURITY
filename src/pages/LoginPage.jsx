@@ -14,6 +14,11 @@ export default function LoginPage({ navigate, setCurrentUser }) {
     setLoading(true);
     setErrorMsg(null);
 
+    localStorage.removeItem('user_profile');
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
+
     if (!email.trim()) {
       setErrorMsg("Please enter your email or username.");
       setLoading(false);
@@ -28,12 +33,11 @@ export default function LoginPage({ navigate, setCurrentUser }) {
 
     try {
       const res = await userAuth.login(email.trim(), password);
-      if (res && res.user) {
+      if (res && res.user && res.token) {
         localStorage.setItem('user_profile', JSON.stringify(res.user));
-        if (res.token) {
-          localStorage.setItem('token', res.token);
-          localStorage.setItem('access_token', res.token);
-        }
+        localStorage.setItem('user', JSON.stringify(res.user));
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('access_token', res.token);
         setCurrentUser(res.user);
         navigate('/dashboard');
       } else {
@@ -42,6 +46,7 @@ export default function LoginPage({ navigate, setCurrentUser }) {
     } catch (err) {
       const msg = err.response?.data?.error || err.response?.data?.detail || err.message || "Authentication failed. Invalid username or password.";
       setErrorMsg(msg);
+      setCurrentUser(null);
     } finally {
       setLoading(false);
     }
