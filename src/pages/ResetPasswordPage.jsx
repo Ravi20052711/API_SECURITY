@@ -25,6 +25,9 @@ export default function ResetPasswordPage({ navigate }) {
     try {
       const res = await authApi.forgotPassword(email.trim());
       if (res) {
+        if (res.dev_reset_code) {
+          setResetToken(res.dev_reset_code);
+        }
         setStep(2);
       }
     } catch (err) {
@@ -72,7 +75,7 @@ export default function ResetPasswordPage({ navigate }) {
         {/* Logo */}
         <div className="sys-logo" onClick={() => navigate('/')} style={{ justifyContent: 'center', marginBottom: '24px', cursor: 'pointer' }}>
           <span className="sys-logo-icon">&gt;_</span>
-          <span>HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span></span>
+          <span className="sys-logo-text">HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span></span>
         </div>
 
         <button 
@@ -145,10 +148,10 @@ export default function ResetPasswordPage({ navigate }) {
             
             <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '14px', borderRadius: '8px' }}>
               <div style={{ fontSize: '12px', color: '#1e40af', fontWeight: '700', marginBottom: '2px' }}>
-                📧 Reset Code Sent via Email
+                🔑 Password Reset Code Generated
               </div>
               <p style={{ fontSize: '11px', color: '#1e3a8a', margin: 0, lineHeight: '1.4' }}>
-                Please check your inbox (<strong>{email}</strong>) for your reset code. You have <strong style={{ color: attemptsLeft <= 1 ? '#dc2626' : '#1e40af' }}>{attemptsLeft} of 3 attempts</strong> remaining.
+                Your 64-character verification code has been populated below for <strong>{email}</strong>. You have <strong style={{ color: attemptsLeft <= 1 ? '#dc2626' : '#1e40af' }}>{attemptsLeft} of 3 attempts</strong> remaining.
               </p>
             </div>
 

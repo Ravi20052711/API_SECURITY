@@ -86,7 +86,7 @@ export default function SignupPage({ navigate, setCurrentUser }) {
         {/* Logo */}
         <div className="sys-logo" onClick={() => navigate('/')} style={{ justifyContent: 'center', marginBottom: '24px', cursor: 'pointer' }}>
           <span className="sys-logo-icon">&gt;_</span>
-          <span>HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span></span>
+          <span className="sys-logo-text">HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span></span>
         </div>
 
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>

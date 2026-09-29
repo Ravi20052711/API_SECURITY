@@ -3,7 +3,7 @@ import { Menu, X } from 'lucide-react';
 
 export default function Navbar({ currentPath, navigate, currentUser, setCurrentUser }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const isAuthenticated = Boolean(currentUser && (localStorage.getItem('token') || localStorage.getItem('access_token') || currentUser.email));
+  const isAuthenticated = Boolean(currentUser && typeof currentUser === 'object' && (localStorage.getItem('token') || localStorage.getItem('access_token') || currentUser?.email));
   const role = currentUser?.role || 'student';
 
   const baseLinks = [
@@ -13,9 +13,18 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
     { path: '/progress', label: 'Progress' },
   ];
 
-  baseLinks.push({ path: '/instructor', label: 'Instructor Portal' });
-  baseLinks.push({ path: '/assessor', label: 'Assessor Portal' });
-  baseLinks.push({ path: '/admin-portal', label: 'Admin Portal' });
+  if (isAuthenticated) {
+    if (role === 'instructor' || role === 'admin') {
+      baseLinks.push({ path: '/instructor', label: 'Instructor Portal' });
+    }
+    if (role === 'assessor' || role === 'admin') {
+      baseLinks.push({ path: '/assessor', label: 'Assessor Portal' });
+    }
+    if (role === 'admin') {
+      baseLinks.push({ path: '/admin-portal', label: 'Admin Portal' });
+    }
+  }
+
   baseLinks.push({ path: '/docs', label: 'Docs' });
 
   const handleNavClick = (targetPath) => {
@@ -34,7 +43,7 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
         {/* Brand Logo */}
         <div className="sys-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           <span className="sys-logo-icon">&gt;_</span>
-          <span>HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span></span>
+          <span className="sys-logo-text">HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span></span>
         </div>
 
         {/* Desktop Navigation Links */}

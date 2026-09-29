@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpRight, Lock } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 
 export default function HomePage({ navigate, isAuthenticated }) {
   const cardsData = [
@@ -64,20 +64,6 @@ export default function HomePage({ navigate, isAuthenticated }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '56px', paddingBottom: '48px' }}>
       
-      {/* Authentication Callout Banner if Unauthenticated */}
-      {!isAuthenticated && (
-        <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '12px 20px', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#1e40af', fontWeight: '700' }}>
-            <Lock size={16} />
-            <span>AUTHENTICATION REQUIRED: Sign in or create an account to access the interactive Docker labs.</span>
-          </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button className="tech-btn tech-btn-sm tech-btn-secondary" onClick={() => navigate('/login')}>Sign In</button>
-            <button className="tech-btn tech-btn-sm tech-btn-primary" onClick={() => navigate('/signup')}>Sign Up</button>
-          </div>
-        </div>
-      )}
-
       {/* Hero Section */}
       <section style={{ maxWidth: '960px', marginTop: '12px' }}>
         <div className="mono" style={{ fontSize: '11px', color: 'var(--brand-orange)', fontWeight: '700', letterSpacing: '1px', marginBottom: '20px' }}>

@@ -7,9 +7,9 @@ export default function Footer({ navigate }) {
       <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
         
         <div>
-          <div className="sys-logo" onClick={() => navigate?.('/')} style={{ marginBottom: '12px' }}>
+          <div className="sys-logo" onClick={() => navigate?.('/')} style={{ marginBottom: '12px', cursor: 'pointer' }}>
             <span className="sys-logo-icon">&gt;_</span>
-            <span>HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span></span>
+            <span className="sys-logo-text">HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span></span>
           </div>
           <p style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
             Deliberately vulnerable API security training system with guided exercises, independent oracle verification, and transfer-learning evaluation.

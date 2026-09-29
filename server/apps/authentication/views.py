@@ -206,9 +206,10 @@ class ForgotPasswordView(APIView):
             email_error = str(e)
 
         return Response({
-            'message': f'Password reset code sent to your email address ({user.email}). Please check your inbox.',
+            'message': f'Password reset code generated for {user.email}.',
             'email': user.email,
-            'email_sent': email_sent
+            'email_sent': email_sent,
+            'dev_reset_code': raw_token
         }, status=status.HTTP_200_OK)
 
 

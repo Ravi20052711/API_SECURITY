@@ -61,7 +61,7 @@ export default function LoginPage({ navigate, setCurrentUser }) {
           {/* Logo */}
           <div className="sys-logo" onClick={() => navigate('/')} style={{ marginBottom: '48px', cursor: 'pointer' }}>
             <span className="sys-logo-icon">&gt;_</span>
-            <span>HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span></span>
+            <span className="sys-logo-text">HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span></span>
           </div>
 
           <div style={{ maxWidth: '380px' }}>

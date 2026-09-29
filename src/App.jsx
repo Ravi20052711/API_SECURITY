@@ -22,36 +22,81 @@ import SettingsPage from './pages/SettingsPage';
 import { useRouter } from './router';
 import { authApi } from './services/api';
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("UI Error caught by ErrorBoundary:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '48px', maxWidth: '600px', margin: '60px auto', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', marginBottom: '12px' }}>Workspace Error Caught</h2>
+          <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '20px' }}>
+            {this.state.error?.message || "An unhandled runtime error occurred in the workspace component."}
+          </p>
+          <button 
+            className="tech-btn tech-btn-primary"
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = '/login';
+            }}
+          >
+            Clear Session & Reload
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   const { currentPath, navigate } = useRouter();
   
   const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem('user_profile') || localStorage.getItem('user');
-    if (saved) {
-      try { return JSON.parse(saved); } catch { return null; }
+    try {
+      const saved = localStorage.getItem('user_profile') || localStorage.getItem('user');
+      if (saved && saved !== 'undefined' && saved !== 'null') {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') return parsed;
+      }
+    } catch (e) {
+      console.warn("Cleared corrupted profile data from localStorage:", e);
+      localStorage.removeItem('user_profile');
+      localStorage.removeItem('user');
     }
     return null;
   });
 
   useEffect(() => {
     if (currentUser) {
-      localStorage.setItem('user_profile', JSON.stringify(currentUser));
-      localStorage.setItem('user', JSON.stringify(currentUser));
+      try {
+        localStorage.setItem('user_profile', JSON.stringify(currentUser));
+        localStorage.setItem('user', JSON.stringify(currentUser));
+      } catch (e) {
+        console.error("Failed to save user profile:", e);
+      }
     }
   }, [currentUser]);
 
   const basePath = currentPath.split('?')[0];
-  const publicPaths = ['/', '/login', '/signup', '/reset-password'];
+  const publicPaths = ['/', '/login', '/signup', '/reset-password', '/docs'];
   
   const hasToken = Boolean(localStorage.getItem('token') || localStorage.getItem('access_token'));
-  const isAuthenticated = Boolean(currentUser && hasToken);
+  const isAuthenticated = Boolean(currentUser && typeof currentUser === 'object' && hasToken);
 
   useEffect(() => {
     if (!isAuthenticated && !publicPaths.includes(basePath)) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user_profile');
-      localStorage.removeItem('user');
       navigate('/login');
     }
   }, [basePath, isAuthenticated]);
@@ -59,96 +104,103 @@ export default function App() {
   const isExerciseRoute = basePath === '/exercise' || currentPath.startsWith('/exercise');
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', overflow: isExerciseRoute ? 'hidden' : undefined }}>
-      
-      {!isExerciseRoute && <SecurityBanner />}
+    <ErrorBoundary>
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', overflow: isExerciseRoute ? 'hidden' : undefined }}>
+        
+        {!isExerciseRoute && <SecurityBanner />}
 
-      {!isExerciseRoute && (
-        <Navbar 
-          currentPath={currentPath}
-          navigate={navigate}
-          currentUser={currentUser}
-          setCurrentUser={(user) => {
-            setCurrentUser(user);
-            if (!user) {
-              authApi.logout();
-              navigate('/login');
-            }
-          }}
-        />
-      )}
+        {!isExerciseRoute && (
+          <Navbar 
+            currentPath={currentPath}
+            navigate={navigate}
+            currentUser={currentUser}
+            setCurrentUser={(user) => {
+              setCurrentUser(user);
+              if (!user) {
+                authApi.logout();
+                navigate('/login');
+              }
+            }}
+          />
+        )}
 
-      <main 
-        className={isExerciseRoute ? "" : "main-container"} 
-        style={isExerciseRoute ? { width: '100vw', height: '100vh', maxWidth: '100%', margin: 0, padding: 0, flex: 1 } : { flex: 1 }}
-      >
-        {basePath === '/' && (
-          isAuthenticated ? (
+        <main 
+          className={isExerciseRoute ? "" : "main-container"} 
+          style={isExerciseRoute ? { width: '100vw', height: '100vh', maxWidth: '100%', margin: 0, padding: 0, flex: 1 } : { flex: 1 }}
+        >
+          {basePath === '/' && (
+            isAuthenticated ? (
+              <DashboardPage navigate={navigate} />
+            ) : (
+              <HomePage navigate={navigate} isAuthenticated={isAuthenticated} />
+            )
+          )}
+
+          {basePath === '/login' && (
+            <LoginPage navigate={navigate} setCurrentUser={setCurrentUser} isAuthenticated={isAuthenticated} />
+          )}
+
+          {basePath === '/signup' && (
+            <SignupPage navigate={navigate} setCurrentUser={setCurrentUser} isAuthenticated={isAuthenticated} />
+          )}
+
+          {basePath === '/reset-password' && (
+            <ResetPasswordPage navigate={navigate} />
+          )}
+
+          {basePath === '/dashboard' && (
             <DashboardPage navigate={navigate} />
-          ) : (
-            <HomePage navigate={navigate} isAuthenticated={isAuthenticated} />
-          )
-        )}
+          )}
 
-        {basePath === '/login' && (
-          <LoginPage navigate={navigate} setCurrentUser={setCurrentUser} isAuthenticated={isAuthenticated} />
-        )}
+          {basePath === '/modules' && (
+            <ModulesPage navigate={navigate} />
+          )}
 
-        {basePath === '/signup' && (
-          <SignupPage navigate={navigate} setCurrentUser={setCurrentUser} isAuthenticated={isAuthenticated} />
-        )}
+          {isExerciseRoute && (
+            <ExercisePage navigate={navigate} key={currentPath} />
+          )}
 
-        {basePath === '/reset-password' && (
-          <ResetPasswordPage navigate={navigate} />
-        )}
+          {basePath === '/assessment' && (
+            <AssessmentPage navigate={navigate} />
+          )}
 
-        {(basePath === '/dashboard' || (basePath === '/' && isAuthenticated)) && (
-          <DashboardPage navigate={navigate} />
-        )}
+          {basePath === '/instructor' && (
+            <InstructorPortalPage navigate={navigate} />
+          )}
 
-        {basePath === '/modules' && (
-          <ModulesPage navigate={navigate} />
-        )}
+          {basePath === '/assessor' && (
+            <AssessorPortalPage navigate={navigate} />
+          )}
 
-        {isExerciseRoute && (
-          <ExercisePage navigate={navigate} key={currentPath} />
-        )}
+          {(basePath === '/admin-portal' || basePath === '/admin') && (
+            <AdminPortalPage navigate={navigate} />
+          )}
 
-        {basePath === '/assessment' && (
-          <AssessmentPage navigate={navigate} />
-        )}
+          {basePath === '/progress' && (
+            <ProgressPage navigate={navigate} />
+          )}
 
-        {basePath === '/instructor' && (
-          <InstructorPortalPage navigate={navigate} />
-        )}
+          {basePath === '/docs' && (
+            <DocsPage navigate={navigate} />
+          )}
 
-        {basePath === '/assessor' && (
-          <AssessorPortalPage navigate={navigate} />
-        )}
+          {basePath === '/settings' && (
+            <SettingsPage currentUser={currentUser} navigate={navigate} />
+          )}
 
-        {(basePath === '/admin-portal' || basePath === '/admin') && (
-          <AdminPortalPage navigate={navigate} />
-        )}
+          {/* Fallback for unknown routes */}
+          {!['/', '/login', '/signup', '/reset-password', '/dashboard', '/modules', '/assessment', '/instructor', '/assessor', '/admin-portal', '/admin', '/progress', '/docs', '/settings'].includes(basePath) && !isExerciseRoute && (
+            isAuthenticated ? <DashboardPage navigate={navigate} /> : <HomePage navigate={navigate} isAuthenticated={false} />
+          )}
 
-        {basePath === '/progress' && (
-          <ProgressPage navigate={navigate} />
-        )}
+        </main>
 
-        {basePath === '/docs' && (
-          <DocsPage navigate={navigate} />
-        )}
+        {/* Floating Qwen AI Assistant Component */}
+        {isAuthenticated && <QwenFloatingAssistant />}
 
-        {basePath === '/settings' && (
-          <SettingsPage currentUser={currentUser} navigate={navigate} />
-        )}
+        {!isExerciseRoute && <Footer navigate={navigate} />}
 
-      </main>
-
-      {/* Floating Qwen AI Assistant Component (Always Available When Logged In Across All Portals) */}
-      {isAuthenticated && <QwenFloatingAssistant />}
-
-      {!isExerciseRoute && <Footer navigate={navigate} />}
-
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

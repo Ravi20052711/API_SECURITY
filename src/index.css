@@ -280,7 +280,8 @@ body.ai-sidebar-open #root {
 
 @media (max-width: 480px) {
   .sys-logo {
-    font-size: 16px;
+    font-size: 14px;
+    padding: 4px 10px;
   }
   .top-env-banner {
     font-size: 9px;
@@ -291,3 +292,44 @@ body.ai-sidebar-open #root {
     font-size: 12px;
   }
 }
+
+/* Clean Logo Design matching Image 2 */
+.sys-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  padding: 0;
+  border: none;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--text-primary);
+  box-shadow: none;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.sys-logo:hover {
+  opacity: 0.9;
+}
+
+.sys-logo-icon {
+  color: var(--brand-orange);
+  background: #231f1d;
+  padding: 5px 9px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.sys-logo-text {
+  color: #0f172a;
+  letter-spacing: -0.5px;
+  font-weight: 800;
+}
+
