@@ -120,17 +120,103 @@ export default function DashboardPage({ navigate }) {
         </div>
       )}
 
-      {/* Header */}
-      <div>
-        <div className="mono" style={{ fontSize: '11px', color: 'var(--brand-orange)', fontWeight: '700', letterSpacing: '1px', marginBottom: '8px' }}>
-          // PERSONALIZED STUDENT DASHBOARD • STRICT MULTI-USER ISOLATION
+      {/* Hero Banner Area - TCS XPLORE Art Style */}
+      <div style={{
+        position: 'relative',
+        width: '100%',
+        minHeight: '320px',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        backgroundImage: `linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.2) 100%), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1600&auto=format&fit=crop')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        padding: '40px 48px',
+        color: '#ffffff',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
+      }}>
+        <div style={{ maxWidth: '640px' }}>
+          <span className="mono" style={{ fontSize: '11px', color: 'var(--brand-orange)', fontWeight: '800', letterSpacing: '1.5px', textTransform: 'uppercase', background: 'rgba(0,0,0,0.6)', padding: '4px 10px', borderRadius: '4px' }}>
+            // OFFICIAL SECURITY LEARNING WORKSPACE
+          </span>
+          
+          <h1 style={{
+            fontSize: '46px',
+            fontWeight: '800',
+            fontFamily: '"Georgia", "Times New Roman", serif, var(--font-sans)',
+            color: '#ffffff',
+            margin: '14px 0 12px 0',
+            lineHeight: '1.1',
+            letterSpacing: '-0.5px'
+          }}>
+            Welcome to HACKTHEAPI
+          </h1>
+
+          <p style={{ fontSize: '15px', color: '#e2e8f0', lineHeight: '1.6', marginBottom: '24px', opacity: 0.95 }}>
+            Interactive OWASP API Security Training Platform for <strong>{currentUser?.name || currentUser?.email || 'Student Hacker'}</strong>. Exploit real vulnerability labs & measure knowledge gain in isolated environments.
+          </p>
+
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <button 
+              className="tech-btn tech-btn-amber"
+              style={{ padding: '12px 24px', fontSize: '14px', fontWeight: '700' }}
+              onClick={() => navigate('/pre-test')}
+            >
+              <span>Start Evaluation Workflow</span>
+              <ArrowRight size={16} />
+            </button>
+            <button 
+              className="tech-btn"
+              style={{ padding: '12px 24px', fontSize: '14px', background: 'rgba(255,255,255,0.15)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.4)', backdropFilter: 'blur(4px)' }}
+              onClick={() => navigate('/modules')}
+            >
+              Explore Lab Catalog
+            </button>
+          </div>
         </div>
-        <h1 style={{ fontSize: '36px', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.5px' }}>
-          Welcome back, <span style={{ color: 'var(--brand-orange)' }}>{currentUser?.name || currentUser?.email || 'Student Hacker'}</span>
-        </h1>
-        <p style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
-          Isolated Account Workspace for <span className="mono" style={{ color: '#0f172a', fontWeight: '700' }}>{currentUser?.email || 'student@lab.dev'}</span>
-        </p>
+      </div>
+
+      {/* 5-Step Evaluation Workflow Bar */}
+      <div className="tech-card" style={{ padding: '20px 24px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div>
+            <span className="mono" style={{ fontSize: '11px', color: 'var(--brand-orange)', fontWeight: '700' }}>// EVALUATION WORKFLOW</span>
+            <h3 style={{ fontSize: '16px', fontWeight: '800', color: '#0f172a', margin: '2px 0 0 0' }}>Pre-Test → Training → Post-Test → Transfer → Usability Flow</h3>
+          </div>
+          <button className="tech-btn tech-btn-sm tech-btn-secondary" onClick={() => navigate('/pre-test')}>
+            <span>Start Step 1: Pre-Test</span>
+            <ArrowRight size={14} />
+          </button>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px' }}>
+          {[
+            { step: '1. Pre-Test', path: '/pre-test', desc: 'Baseline Assessment' },
+            { step: '2. Training', path: '/training', desc: 'OWASP Hands-on Labs' },
+            { step: '3. Post-Test', path: '/post-test', desc: 'Knowledge Gain' },
+            { step: '4. Transfer', path: '/transfer', desc: 'Blind Target Challenge' },
+            { step: '5. Usability', path: '/usability', desc: 'SUS Platform Feedback' }
+          ].map((item, idx) => (
+            <button
+              key={idx}
+              onClick={() => navigate(item.path)}
+              style={{
+                background: '#f8fafc',
+                border: '1px solid #cbd5e1',
+                borderRadius: '8px',
+                padding: '12px 10px',
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <div style={{ fontSize: '12px', fontWeight: '800', color: '#0f172a' }}>{item.step}</div>
+              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>{item.desc}</div>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* 3 Action Cards with Current Active Lab Status */}

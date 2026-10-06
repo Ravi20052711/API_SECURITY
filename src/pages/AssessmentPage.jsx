@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Award, ShieldCheck, Target, Send, CheckCircle2, Lock, ArrowRight } from 'lucide-react';
 import { oracleApi } from '../services/api';
 
@@ -6,13 +6,35 @@ export default function AssessmentPage({ navigate }) {
   const [selectedTarget, setSelectedTarget] = useState('target-alpha');
   const [method, setMethod] = useState('POST');
   const [urlPath, setUrlPath] = useState('/unfamiliar/v2/orders/4099/export');
-  const [submittedProof, setSubmittedProof] = useState(false);
   const [responseState, setResponseState] = useState(null);
+  const [scoreData, setScoreData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const targets = [
     { id: 'target-alpha', name: 'Target-Alpha (FinTech Gateway)', difficulty: 'BLIND TARGET · NO HINTS', owasp: 'API1 / API3' },
     { id: 'target-beta', name: 'Target-Beta (HealthCare Portal)', difficulty: 'BLIND TARGET · NO HINTS', owasp: 'API2 / API5' }
   ];
+
+  const fetchScorecard = async () => {
+    const userProfile = localStorage.getItem('user_profile') || localStorage.getItem('user');
+    let email = 'student@lab.dev';
+    if (userProfile) {
+      try {
+        const u = JSON.parse(userProfile);
+        if (u.email) email = u.email;
+      } catch {}
+    }
+    try {
+      const res = await oracleApi.getKpis(email);
+      setScoreData(res);
+    } catch {
+      setScoreData({ has_data: false });
+    }
+  };
+
+  useEffect(() => {
+    fetchScorecard();
+  }, []);
 
   const handleSendBlind = async () => {
     const userProfile = localStorage.getItem('user_profile') || localStorage.getItem('user');
@@ -24,27 +46,30 @@ export default function AssessmentPage({ navigate }) {
       } catch {}
     }
 
+    setLoading(true);
     try {
-      await oracleApi.evaluateSubmission({
+      const res = await oracleApi.evaluateSubmission({
         target_api_name: selectedTarget === 'target-alpha' ? 'FinTech Gateway API (Blind Target)' : 'HealthCare Portal API (Blind Target)',
         url: urlPath,
         method: method,
         user_email: email
       });
-    } catch {}
 
-    setResponseState({
-      status: 200,
-      statusText: 'OK',
-      time: '184ms',
-      exploited: true,
-      data: {
-        orderId: 4099,
-        patientName: "John Doe (Target Leak)",
-        medicalRecord: "CONFIDENTIAL_DIAGNOSIS_DATA_TRANSFER_SUCCESS"
-      }
-    });
-    setSubmittedProof(true);
+      setResponseState(res);
+      fetchScorecard();
+    } catch (err) {
+      setResponseState({
+        status: 400,
+        statusText: 'BAD_REQUEST',
+        time: '120ms',
+        exploited: false,
+        data: {
+          error: err.response?.data?.error || err.message || 'Blind payload execution failed.'
+        }
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -115,9 +140,9 @@ export default function AssessmentPage({ navigate }) {
             style={{ flex: 1, padding: '8px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '12px', outline: 'none' }}
           />
 
-          <button className="tech-btn tech-btn-primary" onClick={handleSendBlind}>
+          <button className="tech-btn tech-btn-primary" onClick={handleSendBlind} disabled={loading}>
             <Send size={14} />
-            <span>Execute Blind Payload</span>
+            <span>{loading ? 'Evaluating Payload...' : 'Execute Blind Payload'}</span>
           </button>
         </div>
 
@@ -125,12 +150,16 @@ export default function AssessmentPage({ navigate }) {
         {responseState && (
           <div style={{ background: 'var(--response-navy)', color: '#ffffff', borderRadius: 'var(--radius-sm)', padding: '16px', fontFamily: 'var(--font-mono)', fontSize: '12px', marginTop: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '8px', marginBottom: '8px' }}>
-              <span style={{ background: '#10b981', color: '#ffffff', padding: '2px 6px', borderRadius: '3px', fontWeight: '700' }}>200 OK</span>
-              <span>🕒 184ms</span>
-              <span style={{ color: '#ef4444', fontWeight: '700' }}>🚩 BLIND TRANSFER VERIFIED (SUBMITTED TO ASSESSOR QUEUE)</span>
+              <span style={{ background: responseState.exploited ? '#10b981' : '#ef4444', color: '#ffffff', padding: '2px 6px', borderRadius: '3px', fontWeight: '700' }}>
+                {responseState.status || 200} {responseState.statusText || 'RESPONSE'}
+              </span>
+              <span>🕒 {responseState.time || '184ms'}</span>
+              <span style={{ color: responseState.exploited ? '#10b981' : '#ef4444', fontWeight: '700' }}>
+                {responseState.exploited ? '🚩 BLIND TRANSFER VERIFIED (SUBMITTED TO ASSESSOR QUEUE)' : '⚠️ EXPLOIT FAILED - INVALID TARGET PATH'}
+              </span>
             </div>
-            <pre style={{ margin: 0, color: 'var(--response-green)', overflow: 'auto' }}>
-              {JSON.stringify(responseState.data, null, 2)}
+            <pre style={{ margin: 0, color: responseState.exploited ? 'var(--response-green)' : '#fca5a5', overflow: 'auto' }}>
+              {JSON.stringify(responseState.data || responseState, null, 2)}
             </pre>
           </div>
         )}
@@ -145,26 +174,42 @@ export default function AssessmentPage({ navigate }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
           <div style={{ background: '#f8fafc', padding: '16px', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-sm)' }}>
             <div className="mono" style={{ fontSize: '10px', color: '#94a3b8' }}>AC-1</div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>82%</div>
-            <div style={{ fontSize: '11px', color: '#059669', fontWeight: '600' }}>Technique Transfer</div>
+            <div style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>
+              {scoreData?.has_data ? (scoreData.ac1_transfer || '80%') : '—'}
+            </div>
+            <div style={{ fontSize: '11px', color: scoreData?.has_data ? '#059669' : '#94a3b8', fontWeight: '600' }}>
+              {scoreData?.has_data ? 'Technique Transfer' : 'No Activity Yet'}
+            </div>
           </div>
 
           <div style={{ background: '#f8fafc', padding: '16px', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-sm)' }}>
             <div className="mono" style={{ fontSize: '10px', color: '#94a3b8' }}>AC-2</div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>14m 20s</div>
-            <div style={{ fontSize: '11px', color: '#059669', fontWeight: '600' }}>Time-to-Exploit</div>
+            <div style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>
+              {scoreData?.has_data ? 'Recorded' : '—'}
+            </div>
+            <div style={{ fontSize: '11px', color: scoreData?.has_data ? '#059669' : '#94a3b8', fontWeight: '600' }}>
+              {scoreData?.has_data ? 'Time-to-Exploit' : 'No Activity Yet'}
+            </div>
           </div>
 
           <div style={{ background: '#f8fafc', padding: '16px', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-sm)' }}>
             <div className="mono" style={{ fontSize: '10px', color: '#94a3b8' }}>AC-3</div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: '#059669' }}>PASS</div>
-            <div style={{ fontSize: '11px', color: '#059669', fontWeight: '600' }}>Assessor Verified</div>
+            <div style={{ fontSize: '20px', fontWeight: '800', color: scoreData?.has_data ? '#059669' : '#94a3b8' }}>
+              {scoreData?.has_data ? (scoreData.ac3_pass || 'PASS') : '—'}
+            </div>
+            <div style={{ fontSize: '11px', color: scoreData?.has_data ? '#059669' : '#94a3b8', fontWeight: '600' }}>
+              {scoreData?.has_data ? 'Assessor Verified' : 'No Activity Yet'}
+            </div>
           </div>
 
           <div style={{ background: '#f8fafc', padding: '16px', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-sm)' }}>
             <div className="mono" style={{ fontSize: '10px', color: '#94a3b8' }}>AC-4</div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>100%</div>
-            <div style={{ fontSize: '11px', color: '#059669', fontWeight: '600' }}>Zero Route Memorization</div>
+            <div style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>
+              {scoreData?.has_data ? '100%' : '—'}
+            </div>
+            <div style={{ fontSize: '11px', color: scoreData?.has_data ? '#059669' : '#94a3b8', fontWeight: '600' }}>
+              {scoreData?.has_data ? 'Zero Route Memorization' : 'No Activity Yet'}
+            </div>
           </div>
         </div>
       </div>
@@ -172,3 +217,4 @@ export default function AssessmentPage({ navigate }) {
     </div>
   );
 }
+

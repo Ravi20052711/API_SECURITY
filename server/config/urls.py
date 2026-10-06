@@ -12,4 +12,5 @@ urlpatterns = [
     path('api/v1/ai/', include('apps.ai_assistant.urls')),
     path('api/v1/instructor/', include('apps.instructor_portal.urls')),
     path('api/v1/assessor/', include('apps.assessor_portal.urls')),
+    path('api/v1/assessment/', include('apps.assessment.urls')),
 ]

@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'apps.ai_assistant',
     'apps.instructor_portal',
     'apps.assessor_portal',
+    'apps.assessment',
 ]
 
 MIDDLEWARE = [

@@ -3,55 +3,103 @@ import { ExternalLink, Github } from 'lucide-react';
 
 export default function Footer({ navigate }) {
   return (
-    <footer style={{ background: '#ffffff', borderTop: '1px solid var(--border-subtle)', padding: '32px 24px', marginTop: 'auto' }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px' }}>
+    <footer style={{ background: '#0a0a0c', borderTop: '1px solid #1e293b', color: '#ffffff', padding: '40px 24px 24px 24px', marginTop: 'auto' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
         
+        {/* Column 1: Terms & Privacy */}
         <div>
-          <div className="sys-logo" onClick={() => navigate?.('/')} style={{ marginBottom: '12px', cursor: 'pointer' }}>
-            <span className="sys-logo-icon">&gt;_</span>
-            <span className="sys-logo-text">HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span></span>
-          </div>
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
-            Deliberately vulnerable API security training system with guided exercises, independent oracle verification, and transfer-learning evaluation.
-          </p>
-        </div>
-
-        <div>
-          <h4 className="mono" style={{ fontSize: '11px', color: 'var(--brand-orange)', marginBottom: '12px', fontWeight: '700' }}>[ NAVIGATION ]</h4>
-          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px' }}>
-            <li><button onClick={() => navigate?.('/')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>Home</button></li>
-            <li><button onClick={() => navigate?.('/modules')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>Vulnerability Catalog</button></li>
-            <li><button onClick={() => navigate?.('/assessment')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>Transfer Assessment</button></li>
-            <li><button onClick={() => navigate?.('/docs')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>Documentation & FAQ</button></li>
+          <h4 style={{ fontSize: '13px', fontWeight: '800', color: '#ffffff', marginBottom: '16px', letterSpacing: '0.5px' }}>
+            TERMS & PRIVACY
+          </h4>
+          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px', color: '#94a3b8' }}>
+            <li>
+              <button onClick={() => navigate?.('/docs')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', padding: 0, fontSize: '12px' }}>
+                Terms of Use
+              </button>
+            </li>
+            <li>
+              <button onClick={() => navigate?.('/docs')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', padding: 0, fontSize: '12px' }}>
+                Privacy Notice
+              </button>
+            </li>
+            <li>
+              <button onClick={() => navigate?.('/docs')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', padding: 0, fontSize: '12px' }}>
+                Ethical Rules of Engagement
+              </button>
+            </li>
           </ul>
         </div>
 
+        {/* Column 2: CONTACT */}
         <div>
-          <h4 className="mono" style={{ fontSize: '11px', color: 'var(--brand-orange)', marginBottom: '12px', fontWeight: '700' }}>[ SAFETY BOUNDARY ]</h4>
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.5', marginBottom: '8px' }}>
-            OWASP API Security Top 10 Aligned. Operates under isolated sandbox constraints.
-          </p>
-          <span className="tech-badge badge-green">AUTHORIZED LAB ONLY</span>
+          <h4 style={{ fontSize: '13px', fontWeight: '800', color: '#ffffff', marginBottom: '16px', letterSpacing: '0.5px' }}>
+            CONTACT
+          </h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: '#94a3b8' }}>
+            <div>
+              Helpline Number (HackTheAPI): <span style={{ color: '#ffffff', fontWeight: '600' }}>1800 572 3858</span>
+              <br /><span style={{ fontSize: '11px', color: '#64748b' }}>( India Toll Free )</span>
+            </div>
+            <div style={{ marginTop: '4px' }}>
+              Helpline Number (IT Support): <span style={{ color: '#ffffff', fontWeight: '600' }}>1800 209 3111</span>
+              <br /><span style={{ fontSize: '11px', color: '#64748b' }}>( India Toll Free )</span>
+            </div>
+          </div>
         </div>
 
+        {/* Column 3: QUERIES */}
         <div>
-          <h4 className="mono" style={{ fontSize: '11px', color: 'var(--brand-orange)', marginBottom: '12px', fontWeight: '700' }}>[ RESOURCES ]</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
-            <a href="https://owasp.org/www-project-api-security/" target="_blank" rel="noreferrer" style={{ color: 'var(--text-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <ExternalLink size={12} />
-              <span>OWASP API Security</span>
-            </a>
-            <a href="#github" style={{ color: 'var(--text-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Github size={12} />
-              <span>GitHub Repository</span>
-            </a>
+          <h4 style={{ fontSize: '13px', fontWeight: '800', color: '#ffffff', marginBottom: '16px', letterSpacing: '0.5px' }}>
+            QUERIES
+          </h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: '#94a3b8' }}>
+            <div>E-mail (Support): <a href="mailto:support@hacktheapi.dev" style={{ color: '#ffffff', textDecoration: 'none' }}>support@hacktheapi.dev</a></div>
+            <div>E-mail (IT): <a href="mailto:careers@hacktheapi.dev" style={{ color: '#ffffff', textDecoration: 'none' }}>careers@hacktheapi.dev</a></div>
+            <div>E-mail (Lab Ops): <a href="mailto:campus.support1@hacktheapi.dev" style={{ color: '#ffffff', textDecoration: 'none' }}>campus.support1@hacktheapi.dev</a></div>
+          </div>
+        </div>
+
+        {/* Column 4: Follow Us */}
+        <div>
+          <h4 style={{ fontSize: '13px', fontWeight: '800', color: '#ffffff', marginBottom: '16px', letterSpacing: '0.5px' }}>
+            Follow Us
+          </h4>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            {[
+              { icon: 'f', label: 'Facebook' },
+              { icon: 'X', label: 'Twitter/X' },
+              { icon: 'in', label: 'LinkedIn' },
+              { icon: 'yt', label: 'YouTube' }
+            ].map((s, idx) => (
+              <div 
+                key={idx}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  border: '1px solid #ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+                title={s.label}
+              >
+                {s.icon}
+              </div>
+            ))}
           </div>
         </div>
 
       </div>
 
-      <div style={{ textAlign: 'center', borderTop: '1px solid var(--border-subtle)', marginTop: '24px', paddingTop: '16px', fontSize: '11px', color: 'var(--text-muted)' }} className="mono">
-        © 2026 HackTheAPI. All activities logged for research & verification.
+      <div style={{ maxWidth: '1400px', margin: '32px auto 0 auto', paddingTop: '20px', borderTop: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', fontSize: '11px', color: '#64748b' }}>
+        <div>© 2026 HackTheAPI. All Rights Reserved. Authorized Security Research Lab.</div>
+        <div className="mono" style={{ color: 'var(--brand-orange)' }}>// OWASP API SECURITY TOP 10 INTEGRATED PLATFORM</div>
       </div>
     </footer>
   );

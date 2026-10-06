@@ -37,17 +37,19 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
   };
 
   return (
-    <header className="sys-header" style={{ position: 'sticky', top: 0, zIndex: 1000, background: '#ffffff' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+    <header className="sys-header" style={{ position: 'sticky', top: 0, zIndex: 1000, background: '#000000', borderBottom: '1px solid #1e293b', padding: '12px 24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
         
-        {/* Brand Logo */}
-        <div className="sys-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-          <span className="sys-logo-icon">&gt;_</span>
-          <span className="sys-logo-text">HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span></span>
+        {/* Brand Logo with Existing Project Logo */}
+        <div className="sys-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span className="sys-logo-icon" style={{ background: 'var(--brand-orange)', color: '#000000', padding: '4px 8px', borderRadius: '4px', fontWeight: '900', fontSize: '13px' }}>&gt;_</span>
+          <span className="sys-logo-text" style={{ color: '#ffffff', fontSize: '18px', fontWeight: '800', letterSpacing: '-0.5px' }}>
+            HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span>
+          </span>
         </div>
 
         {/* Desktop Navigation Links */}
-        <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
           {baseLinks.map((link) => {
             const isActive = currentPath === link.path;
             return (
@@ -59,9 +61,10 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
                   border: 'none',
                   fontSize: '13px',
                   fontWeight: isActive ? '700' : '500',
-                  color: isActive ? 'var(--brand-orange)' : 'var(--text-muted)',
+                  color: isActive ? 'var(--brand-orange)' : '#cbd5e1',
                   cursor: 'pointer',
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  transition: 'color 0.15s ease'
                 }}
               >
                 {link.label}
@@ -70,15 +73,24 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
           })}
         </nav>
 
-        {/* Right User Actions (Desktop) */}
-        <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Right User Actions (TCS XPLORE Style Outline Button + Logo Mark) */}
+        <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {isAuthenticated ? (
             <>
-              <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600' }}>
+              <span style={{ fontSize: '12px', color: '#cbd5e1', fontWeight: '600' }}>
                 {currentUser?.first_name || currentUser?.name || currentUser?.email || 'User'}
               </span>
               <button 
-                className="tech-btn tech-btn-sm tech-btn-secondary"
+                style={{
+                  background: 'transparent',
+                  border: '1px solid #ffffff',
+                  color: '#ffffff',
+                  padding: '6px 18px',
+                  borderRadius: '4px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
                 onClick={() => {
                   localStorage.clear();
                   setCurrentUser(null);
@@ -90,21 +102,52 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
             </>
           ) : (
             <>
-              <button className="tech-btn tech-btn-sm tech-btn-secondary" onClick={() => navigate('/login')}>
-                Sign In
-              </button>
-              <button className="tech-btn tech-btn-sm tech-btn-primary" onClick={() => navigate('/signup')}>
-                Sign Up
+              <button 
+                style={{
+                  background: 'transparent',
+                  border: '1px solid #ffffff',
+                  color: '#ffffff',
+                  padding: '6px 20px',
+                  borderRadius: '4px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+                onClick={() => navigate('/login')}
+              >
+                Login
               </button>
             </>
           )}
+
+          {/* Secondary Brand Icon (Matching TATA logo mark on right) */}
+          <div 
+            onClick={() => navigate('/')}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '4px',
+              background: '#1e293b',
+              border: '1px solid #334155',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              fontWeight: '900',
+              fontSize: '13px',
+              cursor: 'pointer'
+            }}
+            title="HackTheAPI Security Lab"
+          >
+            &gt;_
+          </div>
         </div>
 
         {/* Mobile Hamburger Toggle Button */}
         <button 
           className="mobile-menu-toggle" 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          style={{ background: 'none', border: 'none', color: '#0f172a', padding: '6px', cursor: 'pointer', display: 'none' }}
+          style={{ background: 'none', border: 'none', color: '#ffffff', padding: '6px', cursor: 'pointer', display: 'none' }}
           aria-label="Toggle navigation menu"
         >
           {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -114,7 +157,7 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', padding: '12px 0 8px', borderTop: '1px solid #e2e8f0', gap: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', padding: '12px 0 8px', borderTop: '1px solid #1e293b', gap: '8px', marginTop: '12px' }}>
           {baseLinks.map((link) => {
             const isActive = currentPath === link.path;
             return (
@@ -122,14 +165,14 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
                 key={link.path}
                 onClick={() => handleNavClick(link.path)}
                 style={{
-                  background: isActive ? '#fff7ed' : 'transparent',
+                  background: isActive ? '#1e293b' : 'transparent',
                   border: 'none',
                   textAlign: 'left',
                   padding: '10px 12px',
                   borderRadius: '6px',
                   fontSize: '14px',
                   fontWeight: isActive ? '700' : '500',
-                  color: isActive ? 'var(--brand-orange)' : '#334155',
+                  color: isActive ? 'var(--brand-orange)' : '#e2e8f0',
                   cursor: 'pointer'
                 }}
               >
@@ -137,11 +180,21 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
               </button>
             );
           })}
-          <div style={{ display: 'flex', gap: '8px', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #f1f5f9' }}>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #1e293b' }}>
             {isAuthenticated ? (
               <button 
-                className="tech-btn tech-btn-secondary"
-                style={{ width: '100%', justifyContent: 'center' }}
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  border: '1px solid #ffffff',
+                  color: '#ffffff',
+                  padding: '10px',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  textAlign: 'center'
+                }}
                 onClick={() => {
                   localStorage.clear();
                   setCurrentUser(null);
@@ -151,14 +204,23 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
                 Log Out ({currentUser?.first_name || 'User'})
               </button>
             ) : (
-              <>
-                <button className="tech-btn tech-btn-secondary" style={{ flex: 1, justifyContent: 'center' }} onClick={() => { setMobileMenuOpen(false); navigate('/login'); }}>
-                  Sign In
-                </button>
-                <button className="tech-btn tech-btn-primary" style={{ flex: 1, justifyContent: 'center' }} onClick={() => { setMobileMenuOpen(false); navigate('/signup'); }}>
-                  Sign Up
-                </button>
-              </>
+              <button 
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  border: '1px solid #ffffff',
+                  color: '#ffffff',
+                  padding: '10px',
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  textAlign: 'center'
+                }}
+                onClick={() => { setMobileMenuOpen(false); navigate('/login'); }}
+              >
+                Login
+              </button>
             )}
           </div>
         </div>

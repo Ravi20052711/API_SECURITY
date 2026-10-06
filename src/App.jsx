@@ -18,6 +18,10 @@ import InstructorPortalPage from './pages/InstructorPortalPage';
 import AssessorPortalPage from './pages/AssessorPortalPage';
 import DocsPage from './pages/DocsPage';
 import SettingsPage from './pages/SettingsPage';
+import PreTestPage from './pages/PreTestPage';
+import TrainingOverviewPage from './pages/TrainingOverviewPage';
+import PostTestPage from './pages/PostTestPage';
+import UsabilityPage from './pages/UsabilityPage';
 
 import { useRouter } from './router';
 import { authApi } from './services/api';
@@ -160,8 +164,24 @@ export default function App() {
             <ExercisePage navigate={navigate} key={currentPath} />
           )}
 
-          {basePath === '/assessment' && (
+          {(basePath === '/assessment' || basePath === '/transfer') && (
             <AssessmentPage navigate={navigate} />
+          )}
+
+          {basePath === '/pre-test' && (
+            <PreTestPage navigate={navigate} />
+          )}
+
+          {basePath === '/training' && (
+            <TrainingOverviewPage navigate={navigate} />
+          )}
+
+          {basePath === '/post-test' && (
+            <PostTestPage navigate={navigate} />
+          )}
+
+          {basePath === '/usability' && (
+            <UsabilityPage navigate={navigate} />
           )}
 
           {basePath === '/instructor' && (
@@ -189,7 +209,7 @@ export default function App() {
           )}
 
           {/* Fallback for unknown routes */}
-          {!['/', '/login', '/signup', '/reset-password', '/dashboard', '/modules', '/assessment', '/instructor', '/assessor', '/admin-portal', '/admin', '/progress', '/docs', '/settings'].includes(basePath) && !isExerciseRoute && (
+          {!['/', '/login', '/signup', '/reset-password', '/dashboard', '/modules', '/assessment', '/transfer', '/pre-test', '/training', '/post-test', '/usability', '/instructor', '/assessor', '/admin-portal', '/admin', '/progress', '/docs', '/settings'].includes(basePath) && !isExerciseRoute && (
             isAuthenticated ? <DashboardPage navigate={navigate} /> : <HomePage navigate={navigate} isAuthenticated={false} />
           )}
 

@@ -181,6 +181,61 @@ export const oracleApi = {
   }
 };
 
+export const assessmentApi = {
+  getQuestions: async (type = 'PRE') => {
+    const res = await apiClient.get(`/assessment/questions?type=${type}`);
+    return res.data;
+  },
+  startAttempt: async (type = 'PRE') => {
+    const userProfile = localStorage.getItem('user_profile') || localStorage.getItem('user');
+    let email = 'student@lab.dev';
+    if (userProfile) {
+      try {
+        const u = JSON.parse(userProfile);
+        if (u.email) email = u.email;
+      } catch {}
+    }
+    const res = await apiClient.post('/assessment/start', { type, email });
+    return res.data;
+  },
+  submitAttempt: async (type = 'PRE', answers = {}) => {
+    const userProfile = localStorage.getItem('user_profile') || localStorage.getItem('user');
+    let email = 'student@lab.dev';
+    if (userProfile) {
+      try {
+        const u = JSON.parse(userProfile);
+        if (u.email) email = u.email;
+      } catch {}
+    }
+    const res = await apiClient.post('/assessment/submit', { type, email, answers });
+    return res.data;
+  },
+  getSummary: async () => {
+    const userProfile = localStorage.getItem('user_profile') || localStorage.getItem('user');
+    let email = 'student@lab.dev';
+    if (userProfile) {
+      try {
+        const u = JSON.parse(userProfile);
+        if (u.email) email = u.email;
+      } catch {}
+    }
+    const res = await apiClient.get(`/assessment/summary?email=${email}`);
+    return res.data;
+  },
+  submitUsability: async (responses = {}) => {
+    const userProfile = localStorage.getItem('user_profile') || localStorage.getItem('user');
+    let email = 'student@lab.dev';
+    if (userProfile) {
+      try {
+        const u = JSON.parse(userProfile);
+        if (u.email) email = u.email;
+      } catch {}
+    }
+    const res = await apiClient.post('/assessment/usability', { email, responses });
+    return res.data;
+  }
+};
+
 export const adminApi = {
   getOverviewStats: async () => {
     try {
