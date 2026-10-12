@@ -42,8 +42,8 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: '48px', maxWidth: '600px', margin: '60px auto', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px solid #cbd5e1', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', marginBottom: '12px' }}>Workspace Error Caught</h2>
+        <div style={{ padding: '48px', maxWidth: '600px', margin: '60px auto', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(15,23,42,0.08)' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#1e293b', marginBottom: '12px' }}>Workspace Exception</h2>
           <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '20px' }}>
             {this.state.error?.message || "An unhandled runtime error occurred in the workspace component."}
           </p>
@@ -104,15 +104,6 @@ export default function App() {
     }
   }, [basePath, isAuthenticated]);
 
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('app_theme') || 'enterprise';
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('app_theme', theme);
-  }, [theme]);
-
   const isExerciseRoute = basePath === '/exercise' || currentPath.startsWith('/exercise');
   const isAuthRoute = basePath === '/login' || basePath === '/signup' || basePath === '/reset-password';
 
@@ -125,8 +116,6 @@ export default function App() {
             currentPath={currentPath}
             navigate={navigate}
             currentUser={currentUser}
-            theme={theme}
-            setTheme={setTheme}
             setCurrentUser={(user) => {
               setCurrentUser(user);
               if (!user) {

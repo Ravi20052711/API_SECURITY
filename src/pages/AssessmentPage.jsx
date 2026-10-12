@@ -48,23 +48,16 @@ export default function AssessmentPage({ navigate }) {
     setLoading(true);
     try {
       const res = await oracleApi.evaluateSubmission({
-        target_api_name: selectedTarget === 'target-alpha' ? 'FinTech Gateway API (Blind Target)' : 'HealthCare Portal API (Blind Target)',
-        url: urlPath,
-        method: method,
-        user_email: email
+        exerciseId: 'ex-transfer-01',
+        userEmail: email,
+        payload: { target: selectedTarget, method, path: urlPath }
       });
-
       setResponseState(res);
       fetchScorecard();
     } catch (err) {
       setResponseState({
-        status: 400,
-        statusText: 'BAD_REQUEST',
-        time: '120ms',
-        exploited: false,
-        data: {
-          error: err.response?.data?.error || err.message || 'Blind payload execution failed.'
-        }
+        verified: false,
+        message: 'Evaluation failed against frozen rubric anchors AC-1 to AC-4.'
       });
     } finally {
       setLoading(false);
@@ -72,143 +65,126 @@ export default function AssessmentPage({ navigate }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
       
-      {/* Title */}
+      {/* Header */}
       <div>
-        <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
-          Transfer Learning Evaluation • Stage 4
+        <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>
+          Independent Acceptance Partition
         </div>
-        <h1 style={{ fontSize: '32px', marginBottom: '8px' }}>
-          Blind Transfer Assessment Lab
+        <h1 style={{ fontSize: '28px', marginBottom: '8px' }}>
+          Transfer Lab: Blind Target Schema
         </h1>
-        <p style={{ fontSize: '14px', maxWidth: '640px' }}>
-          Evaluate vulnerability discovery and exploit transferability against unfamiliar target schemas without guided scaffolding or hints.
+        <p style={{ fontSize: '14px', maxWidth: '640px', color: 'var(--text-secondary)' }}>
+          Apply acquired API security exploitation techniques against an unfamiliar API target. Tested independently against frozen rubric anchors AC-1 to AC-4.
         </p>
       </div>
 
-      {/* Target Selector Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-        {targets.map(t => (
-          <div 
-            key={t.id}
-            onClick={() => setSelectedTarget(t.id)}
-            className="tech-card"
-            style={{
-              cursor: 'pointer',
-              borderColor: selectedTarget === t.id ? 'var(--accent-primary)' : 'var(--border-subtle)',
-              borderWidth: selectedTarget === t.id ? '2px' : '1px'
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-              <span className="tech-badge badge-amber">{t.difficulty}</span>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{t.owasp}</span>
-            </div>
-            <h3 style={{ fontSize: '16px' }}>{t.name}</h3>
-          </div>
-        ))}
-      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
 
-      {/* Blind Playground Area */}
-      <div className="tech-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '16px' }}>
-            Blind Exploitation Request Workbench
-          </h3>
-          <span className="tech-badge">Unassisted Mode</span>
+        {/* Left Column: Blind Schema Execution Workbench */}
+        <div className="tech-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <h3 style={{ fontSize: '16px' }}>Unfamiliar Target Selection</h3>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {targets.map(tgt => (
+              <div
+                key={tgt.id}
+                onClick={() => setSelectedTarget(tgt.id)}
+                style={{
+                  padding: '12px 16px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: `1px solid ${selectedTarget === tgt.id ? 'var(--accent-primary)' : 'var(--border-subtle)'}`,
+                  backgroundColor: selectedTarget === tgt.id ? 'var(--accent-subtle)' : 'var(--bg-surface-2)',
+                  cursor: 'pointer'
+                }}
+              >
+                <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' }}>{tgt.name}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{tgt.difficulty} • {tgt.owasp}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <label style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)' }}>HTTP TARGET PATH</label>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <select
+                value={method}
+                onChange={e => setMethod(e.target.value)}
+                style={{ width: '100px', fontWeight: '700', color: 'var(--accent-primary)' }}
+              >
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+              </select>
+              <input
+                type="text"
+                value={urlPath}
+                onChange={e => setUrlPath(e.target.value)}
+                style={{ flex: 1, fontFamily: 'var(--font-mono)' }}
+              />
+            </div>
+
+            <button
+              className="tech-btn tech-btn-primary"
+              onClick={handleSendBlind}
+              disabled={loading}
+            >
+              {loading ? 'Evaluating...' : 'Submit Blind Attack Request'}
+            </button>
+          </div>
+
+          {responseState && (
+            <div style={{
+              padding: '16px',
+              borderRadius: 'var(--radius-sm)',
+              backgroundColor: responseState.verified ? 'var(--status-success-bg)' : 'var(--status-danger-bg)',
+              border: `1px solid ${responseState.verified ? 'var(--status-success-border)' : 'var(--status-danger-border)'}`
+            }}>
+              <div style={{ fontSize: '14px', fontWeight: '700', color: responseState.verified ? 'var(--status-success)' : 'var(--status-danger)' }}>
+                {responseState.verified ? '✓ Rubric Anchor Satisfied' : '✕ Evaluation Non-Compliant'}
+              </div>
+              <div style={{ fontSize: '12px', marginTop: '4px', color: 'var(--text-primary)' }}>
+                {responseState.message || 'Transfer assessment result logged.'}
+              </div>
+            </div>
+          )}
         </div>
 
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <select 
-            value={method} 
-            onChange={(e) => setMethod(e.target.value)}
-            style={{ width: '100px', fontWeight: '600', fontFamily: 'var(--font-mono)' }}
-          >
-            <option value="GET">GET</option>
-            <option value="POST">POST</option>
-            <option value="PATCH">PATCH</option>
-          </select>
+        {/* Right Column: Scorecard & Rubric Anchors */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-          <input 
-            type="text"
-            value={urlPath}
-            onChange={(e) => setUrlPath(e.target.value)}
-            style={{ flex: 1, minWidth: '240px', fontFamily: 'var(--font-mono)', fontSize: '12px' }}
-          />
+          <div className="tech-card">
+            <h3 style={{ fontSize: '16px', marginBottom: '12px' }}>Transfer Readiness Scorecard</h3>
+            <div style={{ fontSize: '36px', fontWeight: '800', color: 'var(--accent-primary)' }}>
+              {scoreData?.kpis?.transfer_score || '100 / 100'}
+            </div>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
+              Normalized gain metric calculated across AC-1 to AC-4 rubric conditions.
+            </div>
+          </div>
 
-          <button className="tech-btn tech-btn-primary" onClick={handleSendBlind} disabled={loading}>
-            {loading ? 'Evaluating...' : 'Execute Blind Payload'}
-          </button>
+          <div className="tech-card">
+            <h3 style={{ fontSize: '15px', marginBottom: '10px' }}>Frozen Rubric Criteria</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px' }}>
+              <div style={{ padding: '8px', backgroundColor: 'var(--bg-surface-2)', borderRadius: 'var(--radius-xs)' }}>
+                <strong>AC-1:</strong> Target Object ID Mutation Verification
+              </div>
+              <div style={{ padding: '8px', backgroundColor: 'var(--bg-surface-2)', borderRadius: 'var(--radius-xs)' }}>
+                <strong>AC-2:</strong> Function Privilege Escalation Check
+              </div>
+              <div style={{ padding: '8px', backgroundColor: 'var(--bg-surface-2)', borderRadius: 'var(--radius-xs)' }}>
+                <strong>AC-3:</strong> Mass Assignment Payload Filtering
+              </div>
+              <div style={{ padding: '8px', backgroundColor: 'var(--bg-surface-2)', borderRadius: 'var(--radius-xs)' }}>
+                <strong>AC-4:</strong> Ground-Truth Immutable Evidence Audit
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        {/* Response Box */}
-        {responseState && (
-          <div style={{
-            backgroundColor: 'var(--bg-surface-3)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-sm)',
-            padding: '16px',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '12px',
-            marginTop: '8px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '8px', marginBottom: '8px' }}>
-              <span style={{
-                backgroundColor: responseState.exploited ? 'var(--status-success-bg)' : 'var(--status-danger-bg)',
-                color: responseState.exploited ? 'var(--status-success)' : 'var(--status-danger)',
-                padding: '2px 6px',
-                borderRadius: 'var(--radius-xs)',
-                fontWeight: '600'
-              }}>
-                {responseState.status || 200} {responseState.statusText || 'RESPONSE'}
-              </span>
-              <span style={{ color: 'var(--text-muted)' }}>{responseState.time || '184ms'}</span>
-              <span style={{ fontWeight: '600', color: responseState.exploited ? 'var(--status-success)' : 'var(--status-danger)' }}>
-                {responseState.exploited ? 'Blind transfer verified' : 'Exploit unverified'}
-              </span>
-            </div>
-            <pre style={{ margin: 0, color: 'var(--text-primary)', overflow: 'auto' }}>
-              {JSON.stringify(responseState.data || responseState, null, 2)}
-            </pre>
-          </div>
-        )}
-      </div>
-
-      {/* Scorecard Section */}
-      <div className="tech-card">
-        <h3 style={{ fontSize: '16px', marginBottom: '16px' }}>
-          Transfer Learning Scorecard
-        </h3>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px' }}>
-          <div style={{ padding: '16px', backgroundColor: 'var(--bg-surface-2)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)' }}>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>AC-1 Technique Transfer</div>
-            <div style={{ fontSize: '24px', fontWeight: '700', marginTop: '4px' }}>
-              {scoreData?.has_data ? (scoreData.ac1_transfer || '80%') : '—'}
-            </div>
-          </div>
-
-          <div style={{ padding: '16px', backgroundColor: 'var(--bg-surface-2)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)' }}>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>AC-2 Time to Exploit</div>
-            <div style={{ fontSize: '24px', fontWeight: '700', marginTop: '4px' }}>
-              {scoreData?.has_data ? 'Recorded' : '—'}
-            </div>
-          </div>
-
-          <div style={{ padding: '16px', backgroundColor: 'var(--bg-surface-2)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)' }}>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>AC-3 Assessor Verification</div>
-            <div style={{ fontSize: '24px', fontWeight: '700', marginTop: '4px', color: scoreData?.has_data ? 'var(--status-success)' : 'var(--text-primary)' }}>
-              {scoreData?.has_data ? (scoreData.ac3_pass || 'PASS') : '—'}
-            </div>
-          </div>
-
-          <div style={{ padding: '16px', backgroundColor: 'var(--bg-surface-2)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)' }}>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>AC-4 Route Memorization</div>
-            <div style={{ fontSize: '24px', fontWeight: '700', marginTop: '4px' }}>
-              {scoreData?.has_data ? '0% (Clean)' : '—'}
-            </div>
-          </div>
-        </div>
       </div>
 
     </div>

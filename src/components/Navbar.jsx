@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function Navbar({ currentPath, navigate, currentUser, setCurrentUser, theme, setTheme }) {
+export default function Navbar({ currentPath, navigate, currentUser, setCurrentUser }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isAuthenticated = Boolean(currentUser && typeof currentUser === 'object' && (localStorage.getItem('token') || localStorage.getItem('access_token') || currentUser?.email));
   const role = currentUser?.role || 'student';
@@ -10,15 +10,15 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
     { path: '/modules', label: 'Modules' },
     { path: '/assessment', label: 'Transfer Lab' },
     { path: '/progress', label: 'Analytics' },
-    { path: '/docs', label: 'Documentation' },
+    { path: '/docs', label: 'Docs' },
   ];
 
   if (isAuthenticated) {
     if (role === 'instructor' || role === 'admin') {
-      baseLinks.splice(4, 0, { path: '/instructor', label: 'Instructor Portal' });
+      baseLinks.splice(4, 0, { path: '/instructor', label: 'Instructor' });
     }
     if (role === 'assessor' || role === 'admin') {
-      baseLinks.splice(4, 0, { path: '/assessor', label: 'Assessor Portal' });
+      baseLinks.splice(4, 0, { path: '/assessor', label: 'Assessor' });
     }
     if (role === 'admin') {
       baseLinks.splice(4, 0, { path: '/admin-portal', label: 'Admin' });
@@ -39,14 +39,14 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
       position: 'sticky',
       top: 0,
       zIndex: 1000,
-      backgroundColor: 'rgba(251, 251, 253, 0.88)',
-      backdropFilter: 'saturate(180%) blur(20px)',
-      WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+      backgroundColor: 'rgba(255, 255, 255, 0.92)',
+      backdropFilter: 'saturate(180%) blur(12px)',
+      WebkitBackdropFilter: 'saturate(180%) blur(12px)',
       borderBottom: '1px solid var(--border-subtle)',
       height: 'var(--header-height)'
     }}>
       <div style={{
-        maxWidth: '1180px',
+        maxWidth: '1200px',
         margin: '0 auto',
         padding: '0 24px',
         height: '100%',
@@ -54,29 +54,49 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
         alignItems: 'center',
         justifyContent: 'space-between'
       }}>
-        {/* Brand Mark */}
-        <div 
-          onClick={() => navigate('/')} 
-          style={{ 
-            cursor: 'pointer', 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '8px',
-            userSelect: 'none'
-          }}
-        >
-          <span style={{
-            fontSize: '15px',
-            fontWeight: '700',
-            letterSpacing: '-0.02em',
-            color: 'var(--text-primary)'
-          }}>
-            API_SECURITY
+        {/* Brand Mark & Isolation Badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div
+            onClick={() => navigate('/')}
+            style={{
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              userSelect: 'none'
+            }}
+          >
+            <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '6px',
+              backgroundColor: 'var(--accent-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              fontWeight: '800',
+              fontSize: '14px'
+            }}>
+              API
+            </div>
+            <span style={{
+              fontSize: '15px',
+              fontWeight: '700',
+              letterSpacing: '-0.02em',
+              color: 'var(--text-primary)'
+            }}>
+              APISEC_BENCH
+            </span>
+          </div>
+
+          <span className="badge-emerald" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            ISOLATED DOCKER SANDBOX
           </span>
         </div>
 
         {/* Desktop Navigation */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '28px' }} className="nav-desktop">
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '24px' }} className="nav-desktop">
           {baseLinks.map((link) => {
             const isActive = currentPath === link.path;
             return (
@@ -87,11 +107,11 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
                   background: 'none',
                   border: 'none',
                   fontSize: '13px',
-                  fontWeight: isActive ? '600' : '400',
-                  color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  fontWeight: isActive ? '600' : '500',
+                  color: isActive ? 'var(--accent-primary)' : 'var(--text-secondary)',
                   cursor: 'pointer',
-                  padding: '4px 0',
-                  borderBottom: isActive ? '2px solid var(--text-primary)' : '2px solid transparent',
+                  padding: '6px 0',
+                  borderBottom: isActive ? '2px solid var(--accent-primary)' : '2px solid transparent',
                   transition: 'color 0.15s ease'
                 }}
               >
@@ -103,19 +123,9 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
 
         {/* Right Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }} className="nav-desktop">
-          {/* Theme Toggle Button */}
-          <button
-            onClick={() => setTheme?.(theme === 'hand-drawn' ? 'enterprise' : 'hand-drawn')}
-            className="tech-btn tech-btn-sm tech-btn-secondary"
-            title={`Switch to ${theme === 'hand-drawn' ? 'Enterprise' : 'Hand-Drawn'} style`}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: '600' }}
-          >
-            {theme === 'hand-drawn' ? '🏢 Enterprise' : '✏️ Hand-Drawn'}
-          </button>
-
           {isAuthenticated ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+              <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: '500' }}>
                 {currentUser?.first_name || currentUser?.name || currentUser?.email}
               </span>
               <button
@@ -191,7 +201,7 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
                 textAlign: 'left',
                 fontSize: '14px',
                 padding: '8px 0',
-                color: currentPath === link.path ? 'var(--text-primary)' : 'var(--text-secondary)',
+                color: currentPath === link.path ? 'var(--accent-primary)' : 'var(--text-secondary)',
                 fontWeight: currentPath === link.path ? '600' : '400',
                 cursor: 'pointer'
               }}
@@ -199,17 +209,8 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
               {link.label}
             </button>
           ))}
-          <div style={{ padding: '8px 0', borderTop: '1px solid var(--border-subtle)' }}>
-            <button
-              onClick={() => setTheme?.(theme === 'hand-drawn' ? 'enterprise' : 'hand-drawn')}
-              className="tech-btn tech-btn-sm tech-btn-secondary"
-              style={{ width: '100%', justifyContent: 'center' }}
-            >
-              {theme === 'hand-drawn' ? '🏢 Switch to Enterprise Theme' : '✏️ Switch to Hand-Drawn Theme'}
-            </button>
-          </div>
 
-          <div style={{ paddingTop: '8px', display: 'flex', gap: '8px' }}>
+          <div style={{ paddingTop: '12px', borderTop: '1px solid var(--border-subtle)', display: 'flex', gap: '8px' }}>
             {isAuthenticated ? (
               <button
                 className="tech-btn tech-btn-secondary"
@@ -245,7 +246,7 @@ export default function Navbar({ currentPath, navigate, currentUser, setCurrentU
       )}
 
       <style>{`
-        @media (max-width: 768px) {
+        @media (max-width: 860px) {
           .nav-desktop { display: none !important; }
           .nav-mobile-toggle { display: block !important; }
         }

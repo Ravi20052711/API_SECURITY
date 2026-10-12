@@ -57,7 +57,7 @@ export default function DashboardPage({ navigate }) {
         navigate(`/exercise?id=${exId}`);
       }
     } catch (err) {
-      const errMsg = err?.response?.data?.error || "Docker container service is currently starting. Please verify Docker Desktop is running.";
+      const errMsg = err?.response?.data?.error || "Docker container service is starting. Please ensure Docker Desktop is running.";
       setDockerErrorMsg(errMsg);
     } finally {
       setLaunchingExId(null);
@@ -94,14 +94,14 @@ export default function DashboardPage({ navigate }) {
 
       {/* Header */}
       <div>
-        <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
+        <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>
           Student Benchmarking Hub
         </div>
-        <h1 style={{ fontSize: '32px', marginBottom: '6px' }}>
+        <h1 style={{ fontSize: '28px', marginBottom: '6px' }}>
           Welcome, {currentUser?.first_name || currentUser?.name || 'Student'}
         </h1>
-        <p style={{ fontSize: '14px' }}>
-          Workspace account: <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{currentUser?.email || 'student@university.edu'}</span>
+        <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+          Workspace account: <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{currentUser?.email || 'student@university.edu'}</span>
         </p>
       </div>
 
@@ -109,10 +109,10 @@ export default function DashboardPage({ navigate }) {
       <div className="tech-card" style={{ padding: '20px 24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
           <div>
-            <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Evaluation Workflow
             </div>
-            <h3 style={{ fontSize: '15px', marginTop: '2px' }}>
+            <h3 style={{ fontSize: '16px', marginTop: '2px' }}>
               Sequential 5-Stage Knowledge Benchmark
             </h3>
           </div>
@@ -136,15 +136,16 @@ export default function DashboardPage({ navigate }) {
               key={idx}
               onClick={() => navigate(item.path)}
               style={{
-                backgroundColor: 'var(--bg-surface-3)',
+                backgroundColor: 'var(--bg-surface-2)',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: 'var(--radius-sm)',
                 padding: '12px 14px',
                 textAlign: 'left',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'border-color 0.15s ease'
               }}
             >
-              <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>{item.step}</div>
+              <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>{item.step}</div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{item.desc}</div>
             </button>
           ))}
@@ -158,7 +159,7 @@ export default function DashboardPage({ navigate }) {
         <div 
           onClick={handleContinueActiveLab}
           style={{
-            backgroundColor: 'var(--text-primary)',
+            backgroundColor: 'var(--accent-primary)',
             color: 'var(--text-inverse)',
             borderRadius: 'var(--radius-md)',
             padding: '24px',
@@ -166,17 +167,18 @@ export default function DashboardPage({ navigate }) {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            minHeight: '140px'
+            minHeight: '140px',
+            boxShadow: 'var(--shadow-standard)'
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '14px', fontWeight: '600' }}>Active Container Session</span>
+            <span style={{ fontSize: '13px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Active Container Session</span>
             <span style={{
               fontSize: '10px',
-              fontWeight: '600',
+              fontWeight: '700',
               padding: '2px 8px',
               borderRadius: 'var(--radius-xs)',
-              backgroundColor: activeSess ? 'var(--status-success)' : 'rgba(255,255,255,0.2)',
+              backgroundColor: activeSess ? 'var(--status-success)' : 'rgba(255,255,255,0.25)',
               color: '#ffffff'
             }}>
               {activeSess ? 'IN_PROGRESS' : 'READY TO START'}
@@ -184,10 +186,10 @@ export default function DashboardPage({ navigate }) {
           </div>
 
           <div>
-            <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>
+            <div style={{ fontSize: '17px', fontWeight: '700', marginBottom: '4px' }}>
               {launchingExId ? 'Provisioning container...' : (activeSess?.title || 'Launch Guided Lab Workbench')}
             </div>
-            <div style={{ fontSize: '12px', color: '#a1a1a6' }}>
+            <div style={{ fontSize: '12px', color: '#a7f3d0' }}>
               {activeSess ? `Port ${activeSess.port} • Timer active` : 'Select an exercise to initialize Docker environment'}
             </div>
           </div>
@@ -195,12 +197,11 @@ export default function DashboardPage({ navigate }) {
 
         {/* KPI: Technique Transfer */}
         <div className="tech-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <span className="tape-strip"></span>
-          <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             Technique Transfer Score
           </div>
           <div>
-            <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: '32px', fontWeight: '800', color: 'var(--accent-primary)' }}>
               {stats.total_score > 0 ? `${stats.total_score} pts` : '0 pts'}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
@@ -211,12 +212,11 @@ export default function DashboardPage({ navigate }) {
 
         {/* KPI: Completion Rate */}
         <div className="tech-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <span className="thumbtack-pin"></span>
-          <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             Curriculum Completion
           </div>
           <div>
-            <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--text-primary)' }}>
+            <div style={{ fontSize: '32px', fontWeight: '800', color: 'var(--text-primary)' }}>
               {stats.completion_rate}%
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
@@ -257,14 +257,14 @@ export default function DashboardPage({ navigate }) {
                 }}
               >
                 <div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{item.lab_id} • {item.owasp}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '600' }}>{item.lab_id} • {item.owasp}</div>
                   <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', marginTop: '2px' }}>{item.title}</div>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <span style={{
                     fontSize: '11px',
-                    fontWeight: '500',
+                    fontWeight: '600',
                     padding: '2px 8px',
                     borderRadius: 'var(--radius-xs)',
                     backgroundColor: item.status === 'COMPLETED' ? 'var(--status-success-bg)' : 'var(--bg-surface-3)',
@@ -289,7 +289,6 @@ export default function DashboardPage({ navigate }) {
           
           {/* Research Competency */}
           <div className="tech-card">
-            <span className="tape-strip"></span>
             <h3 style={{ fontSize: '15px', marginBottom: '12px' }}>Competency coverage</h3>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
               Covers OWASP API Security Top 10 (BOLA, BOPLA, BFLA, SSRF) and Model Context Protocol (MCP v1.0) agentic tool injection flaws.
@@ -308,7 +307,6 @@ export default function DashboardPage({ navigate }) {
 
           {/* Recent Activity */}
           <div className="tech-card">
-            <span className="thumbtack-pin"></span>
             <h3 style={{ fontSize: '15px', marginBottom: '12px' }}>Session history</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {recentActivity.length === 0 ? (

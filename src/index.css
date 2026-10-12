@@ -1,40 +1,42 @@
 :root {
-  /* Enterprise Mode (Default Clean Aesthetic) */
-  --bg-canvas: #f5f5f7;
+  /* Warm Slate & Forest Emerald Design Palette (No Blue, No Black, No Neon) */
+  --bg-canvas: #f8fafc;
   --bg-surface-1: #ffffff;
-  --bg-surface-2: #fbfbfd;
-  --bg-surface-3: #f0f0f2;
-  --bg-surface-hover: #e8e8ed;
+  --bg-surface-2: #f1f5f9;
+  --bg-surface-3: #e2e8f0;
+  --bg-surface-hover: #cbd5e1;
 
-  --border-subtle: #e5e5ea;
-  --border-standard: #d2d2d7;
-  --border-focus: #0071e3;
+  --border-subtle: #e2e8f0;
+  --border-standard: #cbd5e1;
+  --border-focus: #059669;
 
-  --text-primary: #1d1d1f;
-  --text-secondary: #515154;
-  --text-muted: #6e6e73;
+  /* Text Colors (Deep Slate Charcoal - No Pure Black) */
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
   --text-inverse: #ffffff;
 
-  /* Restrained Accent */
-  --accent-primary: #0071e3;
-  --accent-hover: #0077ed;
-  --accent-subtle: #eef5fc;
-  --accent-border: #bfdbfe;
+  /* Primary Accent: Forest Emerald & Warm Amber (No Blue, No Neon) */
+  --accent-primary: #059669;
+  --accent-hover: #047857;
+  --accent-subtle: #ecfdf5;
+  --accent-border: #a7f3d0;
+  --accent-secondary: #d97706;
 
-  --status-success: #1b7a43;
-  --status-success-bg: #edf7ed;
-  --status-success-border: #c8e6c9;
+  --status-success: #15803d;
+  --status-success-bg: #f0fdf4;
+  --status-success-border: #bbf7d0;
 
   --status-warning: #b45309;
   --status-warning-bg: #fffbeb;
   --status-warning-border: #fde68a;
 
-  --status-danger: #c92a2a;
-  --status-danger-bg: #fee2e2;
-  --status-danger-border: #fca5a5;
+  --status-danger: #be123c;
+  --status-danger-bg: #fff1f2;
+  --status-danger-border: #fecdd3;
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-  --font-heading: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 
   --radius-xs: 4px;
@@ -42,59 +44,8 @@
   --radius-md: 10px;
   --radius-lg: 14px;
 
-  --shadow-standard: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --header-height: 52px;
-}
-
-/* Hand-Drawn Design System Tokens */
-[data-theme="hand-drawn"] {
-  --bg-canvas: #fdfbf7;
-  --bg-surface-1: #ffffff;
-  --bg-surface-2: #fff9c4; /* Post-it yellow */
-  --bg-surface-3: #f5f0e8;
-  --bg-surface-hover: #f0eae0;
-
-  --border-subtle: #2d2d2d;
-  --border-standard: #2d2d2d;
-  --border-focus: #2d5da1;
-
-  --text-primary: #2d2d2d; /* Soft Pencil Black */
-  --text-secondary: #5a5751;
-  --text-muted: #8c877d;
-  --text-inverse: #ffffff;
-
-  /* Accents */
-  --accent-primary: #ff4d4d; /* Red Correction Marker */
-  --accent-hover: #e63939;
-  --accent-subtle: #fee2e2;
-  --accent-border: #2d2d2d;
-  --accent-secondary: #2d5da1; /* Blue Ballpoint Pen */
-
-  --status-success: #1b7a43;
-  --status-success-bg: #dcfce7;
-  --status-success-border: #2d2d2d;
-
-  --status-warning: #b45309;
-  --status-warning-bg: #fef3c7;
-  --status-warning-border: #2d2d2d;
-
-  --status-danger: #ff4d4d;
-  --status-danger-bg: #fee2e2;
-  --status-danger-border: #2d2d2d;
-
-  /* Hand-Drawn Fonts */
-  --font-sans: 'Patrick Hand', cursive, -apple-system, sans-serif;
-  --font-heading: 'Kalam', cursive, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-
-  /* Wobbly Border Radii */
-  --radius-xs: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  --radius-sm: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  --radius-md: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  --radius-lg: 255px 25px 225px 25px / 25px 225px 25px 255px;
-
-  /* Hard Offset Shadows */
-  --shadow-standard: 4px 4px 0px 0px #2d2d2d;
+  --shadow-standard: 0 1px 3px rgba(15, 23, 42, 0.08);
+  --header-height: 56px;
 }
 
 * {
@@ -115,14 +66,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Notebook Paper Grain Texture for Hand-Drawn Theme */
-[data-theme="hand-drawn"] body,
-[data-theme="hand-drawn"] #root {
-  background-color: #fdfbf7;
-  background-image: radial-gradient(#e5e0d8 1.5px, transparent 1.5px);
-  background-size: 24px 24px;
-}
-
 #root {
   position: relative;
   min-height: 100vh;
@@ -136,14 +79,14 @@ body {
 
 /* Layout Containers */
 .main-container {
-  max-width: 1180px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 24px 64px 24px;
+  padding: 32px 24px 64px 24px;
   width: 100%;
 }
 
 .main-container-wide {
-  max-width: 1320px;
+  max-width: 1360px;
   margin: 0 auto;
   padding: 32px 24px 64px 24px;
   width: 100%;
@@ -155,31 +98,26 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: -0.02em;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 h1 {
-  font-size: 44px;
+  font-size: 36px;
   letter-spacing: -0.03em;
 }
 
 h2 {
-  font-size: 28px;
+  font-size: 24px;
 }
 
 h3 {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 p {
   color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.6;
-}
-
-[data-theme="hand-drawn"] p {
-  font-size: 16px;
-  color: #3f3c36;
 }
 
 /* Buttons */
@@ -207,25 +145,25 @@ p {
 }
 
 .tech-btn-primary {
-  background-color: var(--text-primary);
-  color: var(--text-inverse);
-  border-color: var(--text-primary);
-}
-
-.tech-btn-primary:hover {
-  background-color: #333336;
-  border-color: #333336;
-}
-
-.tech-btn-accent {
   background-color: var(--accent-primary);
   color: var(--text-inverse);
   border-color: var(--accent-primary);
 }
 
-.tech-btn-accent:hover {
+.tech-btn-primary:hover {
   background-color: var(--accent-hover);
   border-color: var(--accent-hover);
+}
+
+.tech-btn-accent {
+  background-color: var(--accent-secondary);
+  color: var(--text-inverse);
+  border-color: var(--accent-secondary);
+}
+
+.tech-btn-accent:hover {
+  background-color: #b45309;
+  border-color: #b45309;
 }
 
 .tech-btn-secondary {
@@ -235,8 +173,8 @@ p {
 }
 
 .tech-btn-secondary:hover {
-  background-color: var(--bg-surface-3);
-  border-color: #bcbcc0;
+  background-color: var(--bg-surface-2);
+  border-color: #94a3b8;
 }
 
 .tech-btn-sm {
@@ -250,64 +188,6 @@ p {
   font-weight: 700;
 }
 
-/* Hand-Drawn Button Overrides */
-[data-theme="hand-drawn"] .tech-btn {
-  border: 2.5px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  font-size: 15px;
-}
-
-[data-theme="hand-drawn"] .tech-btn-primary {
-  background-color: #ffffff;
-  color: #2d2d2d;
-}
-
-[data-theme="hand-drawn"] .tech-btn-primary:hover {
-  background-color: #ff4d4d;
-  color: #ffffff;
-  box-shadow: 2px 2px 0px 0px #2d2d2d;
-  transform: translate(2px, 2px) rotate(-0.5deg);
-}
-
-[data-theme="hand-drawn"] .tech-btn-primary:active {
-  box-shadow: 0px 0px 0px 0px #2d2d2d;
-  transform: translate(4px, 4px);
-}
-
-[data-theme="hand-drawn"] .tech-btn-accent {
-  background-color: #ff4d4d;
-  color: #ffffff;
-}
-
-[data-theme="hand-drawn"] .tech-btn-accent:hover {
-  background-color: #e63939;
-  box-shadow: 2px 2px 0px 0px #2d2d2d;
-  transform: translate(2px, 2px) rotate(0.5deg);
-}
-
-[data-theme="hand-drawn"] .tech-btn-accent:active {
-  box-shadow: 0px 0px 0px 0px #2d2d2d;
-  transform: translate(4px, 4px);
-}
-
-[data-theme="hand-drawn"] .tech-btn-secondary {
-  background-color: #f5f0e8;
-  color: #2d2d2d;
-}
-
-[data-theme="hand-drawn"] .tech-btn-secondary:hover {
-  background-color: #2d5da1;
-  color: #ffffff;
-  box-shadow: 2px 2px 0px 0px #2d2d2d;
-  transform: translate(2px, 2px) rotate(0.5deg);
-}
-
-[data-theme="hand-drawn"] .tech-btn-secondary:active {
-  box-shadow: 0px 0px 0px 0px #2d2d2d;
-  transform: translate(4px, 4px);
-}
-
 /* Cards */
 .tech-card {
   background: var(--bg-surface-1);
@@ -316,55 +196,11 @@ p {
   padding: 24px;
   box-shadow: var(--shadow-standard);
   position: relative;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-[data-theme="hand-drawn"] .tech-card {
-  border: 2px solid #2d2d2d;
-  box-shadow: 4px 4px 0px 0px #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-[data-theme="hand-drawn"] .tech-card:hover {
-  transform: rotate(-0.5deg);
-}
-
-/* Tape and Tack Flourishes for Hand-Drawn Theme */
-.tape-strip {
-  display: none;
-}
-
-[data-theme="hand-drawn"] .tape-strip {
-  display: block;
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%) rotate(-2deg);
-  width: 90px;
-  height: 22px;
-  background-color: rgba(229, 224, 216, 0.85);
-  border: 1px dashed rgba(45, 45, 45, 0.4);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-  z-index: 5;
-}
-
-.thumbtack-pin {
-  display: none;
-}
-
-[data-theme="hand-drawn"] .thumbtack-pin {
-  display: block;
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background-color: #ff4d4d;
-  border: 2px solid #2d2d2d;
-  box-shadow: 2px 2px 0px #2d2d2d;
-  z-index: 5;
+.tech-card:hover {
+  border-color: var(--border-standard);
 }
 
 /* Badges */
@@ -378,21 +214,8 @@ p {
   align-items: center;
   gap: 4px;
   border: 1px solid var(--border-subtle);
-  background: var(--bg-surface-3);
+  background: var(--bg-surface-2);
   color: var(--text-secondary);
-}
-
-[data-theme="hand-drawn"] .tech-badge {
-  border: 1.5px solid #2d2d2d;
-  box-shadow: 2px 2px 0px #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  font-size: 13px;
-}
-
-.badge-blue {
-  background-color: var(--accent-subtle);
-  color: var(--accent-primary);
-  border-color: var(--accent-border);
 }
 
 .badge-green {
@@ -413,6 +236,12 @@ p {
   border-color: var(--status-danger-border);
 }
 
+.badge-emerald {
+  background-color: var(--accent-subtle);
+  color: var(--accent-primary);
+  border-color: var(--accent-border);
+}
+
 /* Forms */
 input[type="text"],
 input[type="email"],
@@ -431,39 +260,23 @@ textarea {
   transition: all 0.15s ease;
 }
 
-[data-theme="hand-drawn"] input[type="text"],
-[data-theme="hand-drawn"] input[type="email"],
-[data-theme="hand-drawn"] input[type="password"],
-[data-theme="hand-drawn"] select,
-[data-theme="hand-drawn"] textarea {
-  border: 2px solid #2d2d2d;
-  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  font-size: 15px;
-}
-
 input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--border-focus);
-}
-
-[data-theme="hand-drawn"] input:focus,
-[data-theme="hand-drawn"] select:focus,
-[data-theme="hand-drawn"] textarea:focus {
-  border-color: #2d5da1;
-  box-shadow: 2px 2px 0px #2d5da1;
+  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.15);
 }
 
 /* Responsive */
 @media (max-width: 860px) {
   h1 {
-    font-size: 32px;
+    font-size: 28px;
   }
   h2 {
-    font-size: 24px;
+    font-size: 20px;
   }
   .main-container {
-    padding: 24px 16px 48px 16px;
+    padding: 20px 16px 48px 16px;
   }
 }
 
