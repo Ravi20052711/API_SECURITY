@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Award, ShieldCheck, Target, Send, CheckCircle2, Lock, ArrowRight } from 'lucide-react';
 import { oracleApi } from '../services/api';
 
 export default function AssessmentPage({ navigate }) {
@@ -11,8 +10,8 @@ export default function AssessmentPage({ navigate }) {
   const [loading, setLoading] = useState(false);
 
   const targets = [
-    { id: 'target-alpha', name: 'Target-Alpha (FinTech Gateway)', difficulty: 'BLIND TARGET · NO HINTS', owasp: 'API1 / API3' },
-    { id: 'target-beta', name: 'Target-Beta (HealthCare Portal)', difficulty: 'BLIND TARGET · NO HINTS', owasp: 'API2 / API5' }
+    { id: 'target-alpha', name: 'Target Alpha • FinTech Gateway', difficulty: 'Blind Schema', owasp: 'API1 / API3' },
+    { id: 'target-beta', name: 'Target Beta • HealthCare Portal', difficulty: 'Blind Schema', owasp: 'API2 / API5' }
   ];
 
   const fetchScorecard = async () => {
@@ -73,59 +72,57 @@ export default function AssessmentPage({ navigate }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', paddingBottom: '32px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       
       {/* Title */}
       <div>
-        <div className="mono" style={{ fontSize: '11px', color: 'var(--brand-orange)', fontWeight: '700', letterSpacing: '1px', marginBottom: '4px' }}>
-          // AC-1 → AC-4 TRANSFER LEARNING EVALUATION
+        <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
+          Transfer Learning Evaluation • Stage 4
         </div>
-        <h1 style={{ fontSize: '32px', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.5px' }}>
-          Transfer Assessment Lab
+        <h1 style={{ fontSize: '32px', marginBottom: '8px' }}>
+          Blind Transfer Assessment Lab
         </h1>
-        <p style={{ fontSize: '13px', color: '#64748b' }}>
-          Test your vulnerability exploitation skills against completely unfamiliar blind API targets with 0 route hints.
+        <p style={{ fontSize: '14px', maxWidth: '640px' }}>
+          Evaluate vulnerability discovery and exploit transferability against unfamiliar target schemas without guided scaffolding or hints.
         </p>
       </div>
 
       {/* Target Selector Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
         {targets.map(t => (
           <div 
             key={t.id}
             onClick={() => setSelectedTarget(t.id)}
             className="tech-card"
             style={{
-              padding: '20px',
               cursor: 'pointer',
-              borderColor: selectedTarget === t.id ? 'var(--brand-navy)' : '#e2e8f0',
+              borderColor: selectedTarget === t.id ? 'var(--accent-primary)' : 'var(--border-subtle)',
               borderWidth: selectedTarget === t.id ? '2px' : '1px'
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span className="tech-badge badge-red">{t.difficulty}</span>
-              <span className="mono" style={{ fontSize: '11px', color: '#94a3b8' }}>{t.owasp}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <span className="tech-badge badge-amber">{t.difficulty}</span>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{t.owasp}</span>
             </div>
-            <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a' }}>{t.name}</h3>
+            <h3 style={{ fontSize: '16px' }}>{t.name}</h3>
           </div>
         ))}
       </div>
 
       {/* Blind Playground Area */}
-      <div className="tech-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="tech-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a' }}>
-            🎯 Blind Exploitation Request Workbench
+          <h3 style={{ fontSize: '16px' }}>
+            Blind Exploitation Request Workbench
           </h3>
-          <span className="tech-badge badge-amber">NO HINTS PERMITTED</span>
+          <span className="tech-badge">Unassisted Mode</span>
         </div>
 
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <select 
             value={method} 
             onChange={(e) => setMethod(e.target.value)}
-            className="mono"
-            style={{ padding: '8px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '12px', fontWeight: '700', color: '#0d9488' }}
+            style={{ width: '100px', fontWeight: '600', fontFamily: 'var(--font-mono)' }}
           >
             <option value="GET">GET</option>
             <option value="POST">POST</option>
@@ -136,79 +133,79 @@ export default function AssessmentPage({ navigate }) {
             type="text"
             value={urlPath}
             onChange={(e) => setUrlPath(e.target.value)}
-            className="mono"
-            style={{ flex: 1, padding: '8px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid #cbd5e1', background: '#f8fafc', fontSize: '12px', outline: 'none' }}
+            style={{ flex: 1, minWidth: '240px', fontFamily: 'var(--font-mono)', fontSize: '12px' }}
           />
 
           <button className="tech-btn tech-btn-primary" onClick={handleSendBlind} disabled={loading}>
-            <Send size={14} />
-            <span>{loading ? 'Evaluating Payload...' : 'Execute Blind Payload'}</span>
+            {loading ? 'Evaluating...' : 'Execute Blind Payload'}
           </button>
         </div>
 
         {/* Response Box */}
         {responseState && (
-          <div style={{ background: 'var(--response-navy)', color: '#ffffff', borderRadius: 'var(--radius-sm)', padding: '16px', fontFamily: 'var(--font-mono)', fontSize: '12px', marginTop: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '8px', marginBottom: '8px' }}>
-              <span style={{ background: responseState.exploited ? '#10b981' : '#ef4444', color: '#ffffff', padding: '2px 6px', borderRadius: '3px', fontWeight: '700' }}>
+          <div style={{
+            backgroundColor: 'var(--bg-surface-3)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-sm)',
+            padding: '16px',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '12px',
+            marginTop: '8px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '8px', marginBottom: '8px' }}>
+              <span style={{
+                backgroundColor: responseState.exploited ? 'var(--status-success-bg)' : 'var(--status-danger-bg)',
+                color: responseState.exploited ? 'var(--status-success)' : 'var(--status-danger)',
+                padding: '2px 6px',
+                borderRadius: 'var(--radius-xs)',
+                fontWeight: '600'
+              }}>
                 {responseState.status || 200} {responseState.statusText || 'RESPONSE'}
               </span>
-              <span>🕒 {responseState.time || '184ms'}</span>
-              <span style={{ color: responseState.exploited ? '#10b981' : '#ef4444', fontWeight: '700' }}>
-                {responseState.exploited ? '🚩 BLIND TRANSFER VERIFIED (SUBMITTED TO ASSESSOR QUEUE)' : '⚠️ EXPLOIT FAILED - INVALID TARGET PATH'}
+              <span style={{ color: 'var(--text-muted)' }}>{responseState.time || '184ms'}</span>
+              <span style={{ fontWeight: '600', color: responseState.exploited ? 'var(--status-success)' : 'var(--status-danger)' }}>
+                {responseState.exploited ? 'Blind transfer verified' : 'Exploit unverified'}
               </span>
             </div>
-            <pre style={{ margin: 0, color: responseState.exploited ? 'var(--response-green)' : '#fca5a5', overflow: 'auto' }}>
+            <pre style={{ margin: 0, color: 'var(--text-primary)', overflow: 'auto' }}>
               {JSON.stringify(responseState.data || responseState, null, 2)}
             </pre>
           </div>
         )}
       </div>
 
-      {/* AC-1 to AC-4 Scorecard Section */}
-      <div className="tech-card" style={{ padding: '24px' }}>
-        <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px' }}>
-          🏆 Transfer Learning Scorecard (AC-1 to AC-4)
+      {/* Scorecard Section */}
+      <div className="tech-card">
+        <h3 style={{ fontSize: '16px', marginBottom: '16px' }}>
+          Transfer Learning Scorecard
         </h3>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
-          <div style={{ background: '#f8fafc', padding: '16px', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-sm)' }}>
-            <div className="mono" style={{ fontSize: '10px', color: '#94a3b8' }}>AC-1</div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px' }}>
+          <div style={{ padding: '16px', backgroundColor: 'var(--bg-surface-2)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>AC-1 Technique Transfer</div>
+            <div style={{ fontSize: '24px', fontWeight: '700', marginTop: '4px' }}>
               {scoreData?.has_data ? (scoreData.ac1_transfer || '80%') : '—'}
             </div>
-            <div style={{ fontSize: '11px', color: scoreData?.has_data ? '#059669' : '#94a3b8', fontWeight: '600' }}>
-              {scoreData?.has_data ? 'Technique Transfer' : 'No Activity Yet'}
-            </div>
           </div>
 
-          <div style={{ background: '#f8fafc', padding: '16px', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-sm)' }}>
-            <div className="mono" style={{ fontSize: '10px', color: '#94a3b8' }}>AC-2</div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>
+          <div style={{ padding: '16px', backgroundColor: 'var(--bg-surface-2)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>AC-2 Time to Exploit</div>
+            <div style={{ fontSize: '24px', fontWeight: '700', marginTop: '4px' }}>
               {scoreData?.has_data ? 'Recorded' : '—'}
             </div>
-            <div style={{ fontSize: '11px', color: scoreData?.has_data ? '#059669' : '#94a3b8', fontWeight: '600' }}>
-              {scoreData?.has_data ? 'Time-to-Exploit' : 'No Activity Yet'}
-            </div>
           </div>
 
-          <div style={{ background: '#f8fafc', padding: '16px', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-sm)' }}>
-            <div className="mono" style={{ fontSize: '10px', color: '#94a3b8' }}>AC-3</div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: scoreData?.has_data ? '#059669' : '#94a3b8' }}>
+          <div style={{ padding: '16px', backgroundColor: 'var(--bg-surface-2)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>AC-3 Assessor Verification</div>
+            <div style={{ fontSize: '24px', fontWeight: '700', marginTop: '4px', color: scoreData?.has_data ? 'var(--status-success)' : 'var(--text-primary)' }}>
               {scoreData?.has_data ? (scoreData.ac3_pass || 'PASS') : '—'}
             </div>
-            <div style={{ fontSize: '11px', color: scoreData?.has_data ? '#059669' : '#94a3b8', fontWeight: '600' }}>
-              {scoreData?.has_data ? 'Assessor Verified' : 'No Activity Yet'}
-            </div>
           </div>
 
-          <div style={{ background: '#f8fafc', padding: '16px', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-sm)' }}>
-            <div className="mono" style={{ fontSize: '10px', color: '#94a3b8' }}>AC-4</div>
-            <div style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a' }}>
-              {scoreData?.has_data ? '100%' : '—'}
-            </div>
-            <div style={{ fontSize: '11px', color: scoreData?.has_data ? '#059669' : '#94a3b8', fontWeight: '600' }}>
-              {scoreData?.has_data ? 'Zero Route Memorization' : 'No Activity Yet'}
+          <div style={{ padding: '16px', backgroundColor: 'var(--bg-surface-2)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>AC-4 Route Memorization</div>
+            <div style={{ fontSize: '24px', fontWeight: '700', marginTop: '4px' }}>
+              {scoreData?.has_data ? '0% (Clean)' : '—'}
             </div>
           </div>
         </div>
@@ -217,4 +214,3 @@ export default function AssessmentPage({ navigate }) {
     </div>
   );
 }
-

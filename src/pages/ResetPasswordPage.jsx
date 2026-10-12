@@ -1,287 +1,243 @@
 import React, { useState } from 'react';
-import { Mail, ArrowLeft, Send, CheckCircle2, Key, Lock, Eye, EyeOff, ShieldAlert } from 'lucide-react';
-import { authApi } from '../services/api';
+import { userAuth } from '../services/api';
 
 export default function ResetPasswordPage({ navigate }) {
   const [email, setEmail] = useState('');
-  const [resetToken, setResetToken] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  
-  const [step, setStep] = useState(1); // 1: Request Token | 2: Enter Code & Reset | 3: Success
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const [attemptsLeft, setAttemptsLeft] = useState(3);
 
-  const handleRequestToken = async (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
-    if (!email.trim()) return;
-
     setLoading(true);
+    setMessage(null);
     setErrorMsg(null);
-    setAttemptsLeft(3);
 
-    try {
-      const res = await authApi.forgotPassword(email.trim());
-      if (res) {
-        if (res.dev_reset_code) {
-          setResetToken(res.dev_reset_code);
-        }
-        setStep(2);
-      }
-    } catch (err) {
-      setErrorMsg(err.response?.data?.error || err.message || "Failed to request password reset.");
-    } finally {
+    if (!email.trim()) {
+      setErrorMsg("Please enter your registered email address.");
       setLoading(false);
-    }
-  };
-
-  const handleConfirmReset = async (e) => {
-    e.preventDefault();
-    if (!resetToken.trim() || !newPassword) return;
-
-    if (newPassword !== confirmPassword) {
-      setErrorMsg("Passwords do not match.");
       return;
     }
 
-    setLoading(true);
-    setErrorMsg(null);
-
     try {
-      const res = await authApi.resetPasswordConfirm(resetToken.trim(), newPassword, email);
-      if (res) {
-        setStep(3);
-      }
+      await userAuth.requestPasswordReset(email.trim());
+      setMessage("If an account exists with this email, password recovery instructions have been dispatched.");
     } catch (err) {
-      const remaining = err.response?.data?.attempts_left;
-      if (remaining !== undefined) {
-        setAttemptsLeft(remaining);
-      } else {
-        setAttemptsLeft(prev => Math.max(0, prev - 1));
-      }
-      const msg = err.response?.data?.error || err.message || "Password reset failed. Invalid code.";
-      setErrorMsg(msg);
+      setErrorMsg(err.response?.data?.error || "Unable to dispatch recovery request. Please verify your email.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: '460px', margin: '40px auto', width: '100%' }}>
-      <div className="tech-card" style={{ padding: '36px' }}>
+    <div style={{
+      width: '100vw',
+      minHeight: '100vh',
+      display: 'grid',
+      gridTemplateColumns: '1fr 1.15fr',
+      backgroundColor: '#ffffff',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif'
+    }} className="auth-split-grid">
+      
+      {/* Left Column: Reset Form */}
+      <div style={{
+        padding: '48px 64px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        minHeight: '100vh',
+        backgroundColor: '#ffffff'
+      }} className="auth-form-container">
         
-        {/* Logo */}
-        <div className="sys-logo" onClick={() => navigate('/')} style={{ justifyContent: 'center', marginBottom: '24px', cursor: 'pointer' }}>
-          <span className="sys-logo-icon">&gt;_</span>
-          <span className="sys-logo-text">HackTheAPI<span style={{ color: 'var(--brand-orange)' }}>.</span></span>
-        </div>
-
-        <button 
-          onClick={() => navigate('/login')}
-          className="tech-btn tech-btn-sm tech-btn-secondary"
-          style={{ marginBottom: '20px' }}
+        {/* Top Logo */}
+        <div 
+          onClick={() => navigate('/')} 
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px', 
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
         >
-          <ArrowLeft size={12} />
-          <span>Back to Login</span>
-        </button>
-
-        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a' }}>
-            {step === 1 && "Reset Your Password"}
-            {step === 2 && "Enter Verification Code"}
-            {step === 3 && "Password Reset Complete"}
-          </h2>
-          <p style={{ fontSize: '13px', color: '#64748b' }}>
-            {step === 1 && "Enter your account email to receive your password reset code via email"}
-            {step === 2 && "Enter the verification code sent to your email to choose a new password"}
-            {step === 3 && "Your account password has been updated successfully!"}
-          </p>
+          <div style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            backgroundColor: '#0f172a',
+            color: '#ffffff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: '700',
+            fontSize: '14px'
+          }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+          </div>
+          <div>
+            <div style={{ fontSize: '17px', fontWeight: '700', color: '#0f172a', letterSpacing: '-0.02em', lineHeight: '1.1' }}>
+              API_SECURITY
+            </div>
+          </div>
         </div>
 
-        {errorMsg && (
-          <div style={{ padding: '12px', background: '#fee2e2', border: '1px solid #fca5a5', color: '#991b1b', borderRadius: '4px', fontSize: '12px', marginBottom: '20px', fontWeight: '600' }}>
-            ⚠️ {errorMsg}
-          </div>
-        )}
+        {/* Main Form */}
+        <div style={{ maxWidth: '380px', width: '100%', margin: '40px 0' }}>
+          <h1 style={{ fontSize: '30px', fontWeight: '700', color: '#0f172a', letterSpacing: '-0.02em', marginBottom: '8px' }}>
+            Reset Password
+          </h1>
+          <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '28px' }}>
+            Enter your email to receive recovery instructions.
+          </p>
 
-        {/* STEP 1: REQUEST TOKEN */}
-        {step === 1 && (
-          <form onSubmit={handleRequestToken} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {message && (
+            <div style={{
+              padding: '10px 14px',
+              backgroundColor: '#f0fdf4',
+              border: '1px solid #bbf7d0',
+              color: '#166534',
+              borderRadius: '8px',
+              fontSize: '12px',
+              marginBottom: '20px',
+              fontWeight: '500'
+            }}>
+              {message}
+            </div>
+          )}
+
+          {errorMsg && (
+            <div style={{
+              padding: '10px 14px',
+              backgroundColor: '#fef2f2',
+              border: '1px solid #fecaca',
+              color: '#991b1b',
+              borderRadius: '8px',
+              fontSize: '12px',
+              marginBottom: '20px',
+              fontWeight: '500'
+            }}>
+              {errorMsg}
+            </div>
+          )}
+
+          <form onSubmit={handleReset} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <label style={{ fontSize: '12px', fontWeight: '600', color: '#334155', display: 'block', marginBottom: '6px' }}>
-                Account Email or Username
+              <label style={{ fontSize: '13px', fontWeight: '500', color: '#334155', display: 'block', marginBottom: '6px' }}>
+                Academic Email
               </label>
-              <div style={{ position: 'relative' }}>
-                <Mail size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                <input 
-                  type="text"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="e.g. nagaravisanthosh@gmail.com"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px 10px 38px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid #cbd5e1',
-                    background: '#ffffff',
-                    color: '#0f172a',
-                    fontSize: '13px',
-                    outline: 'none'
-                  }}
-                />
-              </div>
+              <input 
+                type="email"
+                required
+                placeholder="Enter your registered email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '11px 14px',
+                  borderRadius: '8px',
+                  border: '1px solid #cbd5e1',
+                  backgroundColor: '#ffffff',
+                  color: '#0f172a',
+                  fontSize: '14px',
+                  outline: 'none'
+                }}
+              />
             </div>
 
-            <button type="submit" className="tech-btn tech-btn-primary" disabled={loading} style={{ width: '100%', padding: '12px', fontSize: '14px', justifyContent: 'center' }}>
-              <Send size={14} />
-              <span>{loading ? 'Sending Code to Email...' : 'Send Reset Code to Email'}</span>
+            <button 
+              type="submit" 
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '12px',
+                borderRadius: '8px',
+                border: 'none',
+                backgroundColor: '#0f172a',
+                color: '#ffffff',
+                fontWeight: '600',
+                fontSize: '14px',
+                cursor: 'pointer',
+                marginTop: '4px',
+                opacity: loading ? 0.7 : 1
+              }}
+            >
+              {loading ? 'Sending instructions...' : 'Send Recovery Link'}
             </button>
           </form>
-        )}
 
-        {/* STEP 2: CONFIRM RESET CODE & NEW PASSWORD */}
-        {step === 2 && (
-          <form onSubmit={handleConfirmReset} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            
-            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '14px', borderRadius: '8px' }}>
-              <div style={{ fontSize: '12px', color: '#1e40af', fontWeight: '700', marginBottom: '2px' }}>
-                🔑 Password Reset Code Generated
-              </div>
-              <p style={{ fontSize: '11px', color: '#1e3a8a', margin: 0, lineHeight: '1.4' }}>
-                Your 64-character verification code has been populated below for <strong>{email}</strong>. You have <strong style={{ color: attemptsLeft <= 1 ? '#dc2626' : '#1e40af' }}>{attemptsLeft} of 3 attempts</strong> remaining.
-              </p>
-            </div>
-
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <label style={{ fontSize: '12px', fontWeight: '600', color: '#334155' }}>
-                  Verification Code (From Email)
-                </label>
-                <span className="mono" style={{ fontSize: '11px', fontWeight: '800', color: attemptsLeft <= 1 ? '#dc2626' : '#059669' }}>
-                  {attemptsLeft}/3 Attempts Left
-                </span>
-              </div>
-
-              <div style={{ position: 'relative' }}>
-                <Key size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                <input 
-                  type="text"
-                  required
-                  disabled={attemptsLeft <= 0}
-                  value={resetToken}
-                  onChange={(e) => setResetToken(e.target.value)}
-                  placeholder="Paste verification code from email"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px 10px 38px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid #cbd5e1',
-                    background: attemptsLeft <= 0 ? '#f1f5f9' : '#ffffff',
-                    color: '#0f172a',
-                    fontSize: '13px',
-                    outline: 'none'
-                  }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label style={{ fontSize: '12px', fontWeight: '600', color: '#334155', display: 'block', marginBottom: '6px' }}>
-                New Password
-              </label>
-              <div style={{ position: 'relative' }}>
-                <Lock size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                <input 
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  disabled={attemptsLeft <= 0}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password"
-                  style={{
-                    width: '100%',
-                    padding: '10px 36px 10px 38px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid #cbd5e1',
-                    background: attemptsLeft <= 0 ? '#f1f5f9' : '#ffffff',
-                    color: '#0f172a',
-                    fontSize: '13px',
-                    outline: 'none'
-                  }}
-                />
-                <button 
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label style={{ fontSize: '12px', fontWeight: '600', color: '#334155', display: 'block', marginBottom: '6px' }}>
-                Confirm New Password
-              </label>
-              <div style={{ position: 'relative' }}>
-                <Lock size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                <input 
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  disabled={attemptsLeft <= 0}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm new password"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px 10px 38px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: '1px solid #cbd5e1',
-                    background: attemptsLeft <= 0 ? '#f1f5f9' : '#ffffff',
-                    color: '#0f172a',
-                    fontSize: '13px',
-                    outline: 'none'
-                  }}
-                />
-              </div>
-            </div>
-
-            {attemptsLeft <= 0 ? (
-              <button 
-                type="button" 
-                className="tech-btn tech-btn-amber"
-                onClick={() => { setStep(1); setResetToken(''); setErrorMsg(null); setAttemptsLeft(3); }}
-                style={{ width: '100%', padding: '12px', fontSize: '13px', justifyContent: 'center' }}
-              >
-                Request New Reset Code &rarr;
-              </button>
-            ) : (
-              <button type="submit" className="tech-btn tech-btn-primary" disabled={loading} style={{ width: '100%', padding: '12px', fontSize: '14px', justifyContent: 'center' }}>
-                <span>{loading ? 'Updating Password...' : 'Save New Password'}</span>
-              </button>
-            )}
-
-          </form>
-        )}
-
-        {/* STEP 3: SUCCESS */}
-        {step === 3 && (
-          <div style={{ textAlign: 'center', padding: '24px', background: '#d1fae5', border: '1px solid #34d399', borderRadius: 'var(--radius-sm)' }}>
-            <CheckCircle2 color="#059669" size={40} style={{ marginBottom: '12px' }} />
-            <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#065f46', marginBottom: '8px' }}>Password Successfully Reset!</h3>
-            <p style={{ fontSize: '13px', color: '#047857', lineHeight: '1.5', marginBottom: '20px' }}>
-              Your account password has been updated. You can now log into the portal.
-            </p>
-            <button className="tech-btn tech-btn-primary" onClick={() => navigate('/login')} style={{ width: '100%', justifyContent: 'center', padding: '12px' }}>
-              Sign In to Your Account &rarr;
+          <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '13px', color: '#64748b' }}>
+            Remembered your credentials?{' '}
+            <button 
+              onClick={() => navigate('/login')}
+              style={{ background: 'none', border: 'none', color: '#2563eb', fontWeight: '600', cursor: 'pointer', padding: 0 }}
+            >
+              Back to Sign In
             </button>
           </div>
-        )}
+        </div>
+
+        {/* Footer */}
+        <div style={{ fontSize: '12px', color: '#94a3b8' }}>
+          © API_SECURITY Platform 2026
+        </div>
+      </div>
+
+      {/* Right Column: Help & Policy Notice */}
+      <div style={{
+        backgroundColor: '#f8fafc',
+        backgroundImage: 'radial-gradient(circle at 10% 10%, #f1f5f9 0%, #f8fafc 40%, #ffffff 85%)',
+        borderLeft: '1px solid #e2e8f0',
+        padding: '64px 48px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        overflow: 'hidden'
+      }} className="auth-showcase-container">
+        
+        <div>
+          <span style={{ fontSize: '11px', fontWeight: '700', color: '#2563eb', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            Identity & Access Security
+          </span>
+          <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a', margin: '12px 0 16px 0', letterSpacing: '-0.02em' }}>
+            Session & Credential Policy
+          </h2>
+          <p style={{ fontSize: '14px', color: '#475569', lineHeight: '1.6', marginBottom: '24px' }}>
+            Password reset links expire after 30 minutes for laboratory integrity. If you are an instructor or assessor experiencing login difficulty, contact the local lab administrator.
+          </p>
+
+          <div style={{ padding: '16px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px' }}>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: '#0f172a', marginBottom: '4px' }}>
+              Standard Test Credentials
+            </div>
+            <div style={{ fontSize: '12px', color: '#64748b' }}>
+              • Student: <code>student@lab.dev</code> / <code>student123</code><br/>
+              • Assessor: <code>assessor@lab.dev</code> / <code>assessor123</code><br/>
+              • Admin: <code>admin@lab.dev</code> / <code>admin123</code>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ fontSize: '12px', color: '#64748b' }}>
+          Autonomous Protocol Security Research Lab
+        </div>
 
       </div>
+
+      <style>{`
+        @media (max-width: 900px) {
+          .auth-split-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .auth-showcase-container {
+            display: none !important;
+          }
+          .auth-form-container {
+            padding: 32px 24px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

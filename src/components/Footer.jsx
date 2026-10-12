@@ -1,105 +1,89 @@
 import React from 'react';
-import { ExternalLink, Github } from 'lucide-react';
 
 export default function Footer({ navigate }) {
   return (
-    <footer style={{ background: '#0a0a0c', borderTop: '1px solid #1e293b', color: '#ffffff', padding: '40px 24px 24px 24px', marginTop: 'auto' }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
-        
-        {/* Column 1: Terms & Privacy */}
-        <div>
-          <h4 style={{ fontSize: '13px', fontWeight: '800', color: '#ffffff', marginBottom: '16px', letterSpacing: '0.5px' }}>
-            TERMS & PRIVACY
-          </h4>
-          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px', color: '#94a3b8' }}>
-            <li>
-              <button onClick={() => navigate?.('/docs')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', padding: 0, fontSize: '12px' }}>
-                Terms of Use
-              </button>
-            </li>
-            <li>
-              <button onClick={() => navigate?.('/docs')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', padding: 0, fontSize: '12px' }}>
-                Privacy Notice
-              </button>
-            </li>
-            <li>
-              <button onClick={() => navigate?.('/docs')} style={{ background: 'none', border: 'none', color: '#cbd5e1', cursor: 'pointer', padding: 0, fontSize: '12px' }}>
-                Ethical Rules of Engagement
-              </button>
-            </li>
-          </ul>
-        </div>
-
-        {/* Column 2: CONTACT */}
-        <div>
-          <h4 style={{ fontSize: '13px', fontWeight: '800', color: '#ffffff', marginBottom: '16px', letterSpacing: '0.5px' }}>
-            CONTACT
-          </h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: '#94a3b8' }}>
-            <div>
-              Helpline Number (HackTheAPI): <span style={{ color: '#ffffff', fontWeight: '600' }}>1800 572 3858</span>
-              <br /><span style={{ fontSize: '11px', color: '#64748b' }}>( India Toll Free )</span>
+    <footer style={{
+      backgroundColor: 'var(--bg-canvas)',
+      borderTop: '1px solid var(--border-subtle)',
+      padding: '48px 24px 36px 24px',
+      marginTop: 'auto',
+      fontSize: '12px',
+      color: 'var(--text-muted)'
+    }}>
+      <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '32px',
+          paddingBottom: '36px',
+          borderBottom: '1px solid var(--border-subtle)'
+        }}>
+          <div>
+            <div style={{ fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px', fontSize: '13px' }}>
+              API_SECURITY Platform
             </div>
-            <div style={{ marginTop: '4px' }}>
-              Helpline Number (IT Support): <span style={{ color: '#ffffff', fontWeight: '600' }}>1800 209 3111</span>
-              <br /><span style={{ fontSize: '11px', color: '#64748b' }}>( India Toll Free )</span>
+            <p style={{ fontSize: '12px', lineHeight: '1.6', color: 'var(--text-secondary)' }}>
+              Interactive hands-on training, assessment, and benchmarking environment for API security flaws and Autonomous AI Agent Protocols (Model Context Protocol / MCP v1.0).
+            </p>
+            <div style={{ marginTop: '12px', fontSize: '11px', color: 'var(--text-muted)' }}>
+              Autonomous Protocol Security Research
             </div>
           </div>
-        </div>
 
-        {/* Column 3: QUERIES */}
-        <div>
-          <h4 style={{ fontSize: '13px', fontWeight: '800', color: '#ffffff', marginBottom: '16px', letterSpacing: '0.5px' }}>
-            QUERIES
-          </h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: '#94a3b8' }}>
-            <div>E-mail (Support): <a href="mailto:support@hacktheapi.dev" style={{ color: '#ffffff', textDecoration: 'none' }}>support@hacktheapi.dev</a></div>
-            <div>E-mail (IT): <a href="mailto:careers@hacktheapi.dev" style={{ color: '#ffffff', textDecoration: 'none' }}>careers@hacktheapi.dev</a></div>
-            <div>E-mail (Lab Ops): <a href="mailto:campus.support1@hacktheapi.dev" style={{ color: '#ffffff', textDecoration: 'none' }}>campus.support1@hacktheapi.dev</a></div>
+          <div>
+            <div style={{ fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px', fontSize: '13px' }}>
+              Curriculum & Labs
+            </div>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', padding: 0 }}>
+              <li><button onClick={() => navigate?.('/modules')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, fontSize: '12px' }}>OWASP API Security Top 10</button></li>
+              <li><button onClick={() => navigate?.('/modules')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, fontSize: '12px' }}>MCP Agentic Protocol Flaws</button></li>
+              <li><button onClick={() => navigate?.('/assessment')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, fontSize: '12px' }}>Blind Transfer Assessment</button></li>
+              <li><button onClick={() => navigate?.('/pre-test')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, fontSize: '12px' }}>Baseline Pre-Test</button></li>
+              <li><button onClick={() => navigate?.('/post-test')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, fontSize: '12px' }}>Knowledge Gain Post-Test</button></li>
+            </ul>
+          </div>
+
+          <div>
+            <div style={{ fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px', fontSize: '13px' }}>
+              Documentation & Specifications
+            </div>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', padding: 0 }}>
+              <li><button onClick={() => navigate?.('/docs')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, fontSize: '12px' }}>Platform Documentation</button></li>
+              <li><button onClick={() => navigate?.('/docs')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, fontSize: '12px' }}>MCP v1.0 JSON-RPC Specification</button></li>
+              <li><button onClick={() => navigate?.('/docs')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, fontSize: '12px' }}>Oracle Verification Engine</button></li>
+              <li><button onClick={() => navigate?.('/usability')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, fontSize: '12px' }}>System Usability Survey</button></li>
+            </ul>
+          </div>
+
+          <div>
+            <div style={{ fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px', fontSize: '13px' }}>
+              Academic & Governance
+            </div>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px', padding: 0 }}>
+              <li><button onClick={() => navigate?.('/docs')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, fontSize: '12px' }}>Ethical Hacking Agreement</button></li>
+              <li><button onClick={() => navigate?.('/docs')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, fontSize: '12px' }}>Terms of Service (Academic Draft)</button></li>
+              <li><button onClick={() => navigate?.('/docs')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 0, fontSize: '12px' }}>Privacy Policy (Telemetry & Logs)</button></li>
+              <li><span style={{ color: 'var(--status-success)', fontSize: '11px', fontWeight: '500' }}>Oracle Engine: Online</span></li>
+            </ul>
           </div>
         </div>
 
-        {/* Column 4: Follow Us */}
-        <div>
-          <h4 style={{ fontSize: '13px', fontWeight: '800', color: '#ffffff', marginBottom: '16px', letterSpacing: '0.5px' }}>
-            Follow Us
-          </h4>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            {[
-              { icon: 'f', label: 'Facebook' },
-              { icon: 'X', label: 'Twitter/X' },
-              { icon: 'in', label: 'LinkedIn' },
-              { icon: 'yt', label: 'YouTube' }
-            ].map((s, idx) => (
-              <div 
-                key={idx}
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  border: '1px solid #ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '12px',
-                  fontWeight: '700',
-                  color: '#ffffff',
-                  cursor: 'pointer',
-                  transition: 'background 0.2s'
-                }}
-                title={s.label}
-              >
-                {s.icon}
-              </div>
-            ))}
+        <div style={{
+          paddingTop: '20px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '12px',
+          fontSize: '11px'
+        }}>
+          <div>
+            © 2026 API_SECURITY Platform. All rights reserved.
+          </div>
+          <div>
+            Research Edition • Model Context Protocol v1.0 Aligned
           </div>
         </div>
-
-      </div>
-
-      <div style={{ maxWidth: '1400px', margin: '32px auto 0 auto', paddingTop: '20px', borderTop: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', fontSize: '11px', color: '#64748b' }}>
-        <div>© 2026 HackTheAPI. All Rights Reserved. Authorized Security Research Lab.</div>
-        <div className="mono" style={{ color: 'var(--brand-orange)' }}>// OWASP API SECURITY TOP 10 INTEGRATED PLATFORM</div>
       </div>
     </footer>
   );

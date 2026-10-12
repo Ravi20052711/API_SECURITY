@@ -1,168 +1,422 @@
-import React from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import React, { useState } from 'react';
 
 export default function HomePage({ navigate, isAuthenticated }) {
-  const cardsData = [
-    {
-      owasp: 'API1:2023',
-      difficulty: 'BEGINNER',
-      difficultyBadgeClass: 'badge-cyan',
-      title: 'Broken Object Level Authorization',
-      description: "Access other users' resources by manipulating object identifiers in API requests.",
-      route: 'GET /api/v1/users/{id}/invoices'
-    },
-    {
-      owasp: 'API2:2023',
-      difficulty: 'INTERMEDIATE',
-      difficultyBadgeClass: 'badge-amber',
-      title: 'Broken Authentication',
-      description: 'Exploit weak token handling and credential stuffing to hijack sessions.',
-      route: 'POST /api/v1/auth/refresh'
-    },
-    {
-      owasp: 'API3:2023',
-      difficulty: 'INTERMEDIATE',
-      difficultyBadgeClass: 'badge-amber',
-      title: 'Broken Object Property Level Authorization',
-      description: "Excessive data exposure & mass assignment — write to properties you shouldn't control.",
-      route: 'PATCH /api/v1/users/me'
-    },
-    {
-      owasp: 'API4:2023',
-      difficulty: 'BEGINNER',
-      difficultyBadgeClass: 'badge-cyan',
-      title: 'Unrestricted Resource Consumption',
-      description: 'Trigger denial-of-service via unbounded pagination and missing rate limits.',
-      route: 'GET /api/v1/products'
-    },
-    {
-      owasp: 'API5:2023',
-      difficulty: 'ADVANCED',
-      difficultyBadgeClass: 'badge-red',
-      title: 'Broken Function Level Authorization',
-      description: 'Invoke administrative functions as a low-privileged user.',
-      route: 'DELETE /api/v1/admin/users/{id}'
-    },
-    {
-      owasp: 'API7:2023',
-      difficulty: 'ADVANCED',
-      difficultyBadgeClass: 'badge-red',
-      title: 'Server Side Request Forgery',
-      description: 'Coerce the server into making requests to internal metadata services.',
-      route: 'POST /api/v1/fetch-avatar'
-    }
-  ];
+  const [activeDemoTab, setActiveDemoTab] = useState('rest');
 
   const handleAction = () => {
     if (isAuthenticated) {
-      navigate('/modules');
+      navigate('/dashboard');
     } else {
       navigate('/login');
     }
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '56px', paddingBottom: '48px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '80px', paddingBottom: '32px' }}>
       
-      {/* Hero Section - TCS XPLORE Art Style */}
+      {/* Hero Section */}
+      <section style={{ maxWidth: '820px', margin: '32px auto 0 auto', textAlign: 'center' }}>
+
+        <h1 style={{
+          fontSize: '48px',
+          fontWeight: '700',
+          letterSpacing: '-0.03em',
+          lineHeight: '1.12',
+          color: 'var(--text-primary)',
+          marginBottom: '20px'
+        }}>
+          Precision security benchmarking for APIs and Autonomous AI Agent Protocols.
+        </h1>
+
+        <p style={{
+          fontSize: '17px',
+          lineHeight: '1.55',
+          color: 'var(--text-secondary)',
+          maxWidth: '680px',
+          margin: '0 auto 32px auto'
+        }}>
+          An interactive laboratory for evaluating vulnerabilities across REST APIs and Model Context Protocol (MCP v1.0) servers. Practice exploitation in isolated Docker environments with automated verification.
+        </p>
+
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button 
+            className="tech-btn tech-btn-primary tech-btn-lg" 
+            onClick={handleAction}
+          >
+            {isAuthenticated ? 'Open Student Dashboard' : 'Start interactive labs'}
+          </button>
+          <button 
+            className="tech-btn tech-btn-secondary tech-btn-lg" 
+            onClick={() => navigate('/docs')}
+          >
+            Read documentation
+          </button>
+        </div>
+      </section>
+
+      {/* Main Product Showcase Visual */}
       <section style={{
-        position: 'relative',
+        maxWidth: '1080px',
+        margin: '0 auto',
         width: '100%',
-        minHeight: '380px',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        backgroundImage: `linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.2) 100%), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1600&auto=format&fit=crop')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        padding: '48px 48px',
-        color: '#ffffff',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
-        marginTop: '12px'
+        backgroundColor: 'var(--bg-surface-1)',
+        border: '1px solid var(--border-standard)',
+        borderRadius: 'var(--radius-lg)',
+        overflow: 'hidden'
       }}>
-        <div style={{ maxWidth: '680px' }}>
-          <span className="mono" style={{ fontSize: '11px', color: 'var(--brand-orange)', fontWeight: '800', letterSpacing: '1.5px', textTransform: 'uppercase', background: 'rgba(0,0,0,0.6)', padding: '4px 10px', borderRadius: '4px' }}>
-            // OWASP API SECURITY TOP 10 • HANDS-ON LABS
-          </span>
+        {/* Showcase Header Bar */}
+        <div style={{
+          padding: '12px 20px',
+          borderBottom: '1px solid var(--border-subtle)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: 'var(--bg-surface-2)',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#e5e5ea', display: 'inline-block' }}></span>
+            <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#e5e5ea', display: 'inline-block' }}></span>
+            <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#e5e5ea', display: 'inline-block' }}></span>
+            <span style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-muted)', marginLeft: '8px' }}>
+              Interactive Lab Workbench
+            </span>
+          </div>
 
-          <h1 style={{
-            fontSize: '52px',
-            fontWeight: '800',
-            fontFamily: '"Georgia", "Times New Roman", serif, var(--font-sans)',
-            color: '#ffffff',
-            margin: '16px 0 14px 0',
-            lineHeight: '1.1',
-            letterSpacing: '-0.5px'
-          }}>
-            Welcome to HACKTHEAPI
-          </h1>
-
-          <p style={{ fontSize: '16px', color: '#e2e8f0', lineHeight: '1.6', maxWidth: '580px', marginBottom: '28px', opacity: 0.95 }}>
-            A deliberately vulnerable API platform where you exploit real flaws inside isolated Docker containers, track progress, and measure conceptual knowledge gain.
-          </p>
-
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <button className="tech-btn tech-btn-amber" style={{ padding: '12px 24px', fontSize: '14px', fontWeight: '700' }} onClick={handleAction}>
-              <span>{isAuthenticated ? 'Enter Training Workspace' : 'Sign in to Start Hacking'}</span>
-              <ArrowUpRight size={16} />
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <button
+              onClick={() => setActiveDemoTab('rest')}
+              style={{
+                background: activeDemoTab === 'rest' ? 'var(--bg-surface-1)' : 'transparent',
+                border: activeDemoTab === 'rest' ? '1px solid var(--border-standard)' : '1px solid transparent',
+                borderRadius: 'var(--radius-xs)',
+                padding: '4px 10px',
+                fontSize: '12px',
+                fontWeight: activeDemoTab === 'rest' ? '600' : '400',
+                color: activeDemoTab === 'rest' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                cursor: 'pointer'
+              }}
+            >
+              REST API Target (BFLA)
             </button>
+            <button
+              onClick={() => setActiveDemoTab('mcp')}
+              style={{
+                background: activeDemoTab === 'mcp' ? 'var(--bg-surface-1)' : 'transparent',
+                border: activeDemoTab === 'mcp' ? '1px solid var(--border-standard)' : '1px solid transparent',
+                borderRadius: 'var(--radius-xs)',
+                padding: '4px 10px',
+                fontSize: '12px',
+                fontWeight: activeDemoTab === 'mcp' ? '600' : '400',
+                color: activeDemoTab === 'mcp' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                cursor: 'pointer'
+              }}
+            >
+              MCP Protocol Target (Tool Injection)
+            </button>
+          </div>
+        </div>
 
-            {!isAuthenticated && (
-              <button 
-                className="tech-btn" 
-                style={{ padding: '12px 24px', fontSize: '14px', background: 'rgba(255,255,255,0.15)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.4)', backdropFilter: 'blur(4px)' }} 
-                onClick={() => navigate('/signup')}
-              >
-                <span>Create Free Account</span>
-              </button>
-            )}
+        {/* Showcase Body Preview */}
+        <div style={{ padding: '24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+          {/* Left: Request Construction */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              {activeDemoTab === 'rest' ? 'HTTP Request Builder' : 'JSON-RPC 2.0 MCP Message'}
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <span style={{
+                padding: '6px 10px',
+                backgroundColor: activeDemoTab === 'rest' ? 'var(--status-danger-bg)' : 'var(--accent-subtle)',
+                color: activeDemoTab === 'rest' ? 'var(--status-danger)' : 'var(--accent-primary)',
+                borderRadius: 'var(--radius-xs)',
+                fontSize: '12px',
+                fontWeight: '700',
+                fontFamily: 'var(--font-mono)'
+              }}>
+                {activeDemoTab === 'rest' ? 'DELETE' : 'POST'}
+              </span>
+              <input 
+                type="text" 
+                readOnly 
+                value={activeDemoTab === 'rest' ? '/api/v1/users/carlos' : '/mcp/v1/tools/call'} 
+                style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}
+              />
+            </div>
+
+            <div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Headers</div>
+              <pre style={{
+                backgroundColor: 'var(--bg-surface-3)',
+                padding: '10px',
+                borderRadius: 'var(--radius-xs)',
+                fontSize: '11px',
+                fontFamily: 'var(--font-mono)',
+                color: 'var(--text-primary)',
+                margin: 0
+              }}>
+                {activeDemoTab === 'rest' 
+                  ? 'Authorization: Bearer token_wiener_9941\nContent-Type: application/json'
+                  : 'Content-Type: application/json\nX-MCP-Protocol-Version: 2024-11-05'}
+              </pre>
+            </div>
+
+            <div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Payload Body</div>
+              <pre style={{
+                backgroundColor: 'var(--bg-surface-3)',
+                padding: '10px',
+                borderRadius: 'var(--radius-xs)',
+                fontSize: '11px',
+                fontFamily: 'var(--font-mono)',
+                color: 'var(--text-primary)',
+                margin: 0,
+                minHeight: '80px'
+              }}>
+                {activeDemoTab === 'rest'
+                  ? '{\n  "reason": "Administrative deletion request"\n}'
+                  : '{\n  "jsonrpc": "2.0",\n  "method": "tools/call",\n  "params": {\n    "name": "system_exec",\n    "arguments": { "command": "cat /etc/passwd" }\n  }\n}'}
+              </pre>
+            </div>
+          </div>
+
+          {/* Right: Live Telemetry & Verification */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Server Response & Oracle Engine
+              </span>
+              <span className="tech-badge badge-green">
+                Status: 200 OK (Exploit Verified)
+              </span>
+            </div>
+
+            <div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Target Response Body</div>
+              <pre style={{
+                backgroundColor: 'var(--bg-surface-3)',
+                padding: '10px',
+                borderRadius: 'var(--radius-xs)',
+                fontSize: '11px',
+                fontFamily: 'var(--font-mono)',
+                color: 'var(--text-primary)',
+                margin: 0,
+                minHeight: '120px'
+              }}>
+                {activeDemoTab === 'rest'
+                  ? '{\n  "status": "success",\n  "deleted_user": "carlos",\n  "executed_by": "wiener (role: standard)",\n  "warning": "Unprotected admin function invoked"\n}'
+                  : '{\n  "jsonrpc": "2.0",\n  "result": {\n    "toolResult": "root:x:0:0:root:/root:/bin/bash...",\n    "isError": false\n  }\n}'}
+              </pre>
+            </div>
+
+            <div style={{
+              backgroundColor: 'var(--accent-subtle)',
+              border: '1px solid var(--accent-border)',
+              padding: '12px',
+              borderRadius: 'var(--radius-sm)'
+            }}>
+              <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--accent-primary)', marginBottom: '4px' }}>
+                Oracle Verification Logic
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                {activeDemoTab === 'rest'
+                  ? 'Verified: Low-privileged account wiener deleted target carlos without administrative authorization tokens.'
+                  : 'Verified: Autonomous agent executed unsanitized system_exec tool call triggered by untrusted parameter injection.'}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 6 Vulnerability Cards Grid */}
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-        {cardsData.map((card, idx) => (
-          <div 
-            key={idx} 
-            className="tech-card" 
-            onClick={handleAction}
-            style={{ padding: '24px', cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '210px' }}
-          >
+      {/* Curriculum Coverage: REST API Security & MCP Protocols */}
+      <section style={{ maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <h2 style={{ fontSize: '32px', marginBottom: '12px' }}>
+            Structured laboratory curriculum
+          </h2>
+          <p style={{ maxWidth: '600px', margin: '0 auto' }}>
+            Hands-on vulnerability modules covering both classical API weaknesses and emerging agentic protocol threats.
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+          {/* Track 1 */}
+          <div className="tech-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <span className="tape-strip"></span>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                <span className="mono" style={{ fontSize: '11px', color: '#94a3b8' }}>{card.owasp}</span>
-                <span className={`tech-badge ${card.difficultyBadgeClass}`}>{card.difficulty}</span>
-              </div>
-
-              <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', marginBottom: '8px', lineHeight: '1.3' }}>
-                {card.title}
+              <span className="tech-badge badge-blue" style={{ marginBottom: '14px' }}>
+                Track 1 • OWASP API Security Top 10
+              </span>
+              <h3 style={{ fontSize: '18px', marginBottom: '10px' }}>
+                Modern Web & Mobile REST API Flaws
               </h3>
-
-              <p style={{ fontSize: '12px', color: '#64748b', lineHeight: '1.5' }}>
-                {card.description}
+              <p style={{ fontSize: '13px', lineHeight: '1.6', marginBottom: '16px' }}>
+                Identify and exploit authorization and parameter tampering flaws across containerized microservices.
               </p>
+              <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                <li>• Broken Object Level Authorization (BOLA / API1)</li>
+                <li>• Broken Object Property Level Authorization (BOPLA / API3)</li>
+                <li>• Broken Function Level Authorization (BFLA / API5)</li>
+                <li>• Server-Side Request Forgery (SSRF / API7)</li>
+              </ul>
             </div>
-
-            <div className="mono" style={{ fontSize: '11px', color: '#0d9488', marginTop: '16px' }}>
-              {card.route}
-            </div>
+            <button 
+              className="tech-btn tech-btn-secondary" 
+              style={{ marginTop: '24px', width: '100%' }}
+              onClick={() => navigate('/modules')}
+            >
+              Explore REST API labs
+            </button>
           </div>
-        ))}
+
+          {/* Track 2 */}
+          <div className="tech-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <span className="thumbtack-pin"></span>
+            <div>
+              <span className="tech-badge badge-amber" style={{ marginBottom: '14px' }}>
+                Track 2 • Model Context Protocol (MCP v1.0)
+              </span>
+              <h3 style={{ fontSize: '18px', marginBottom: '10px' }}>
+                Autonomous AI Agent Protocol Security
+              </h3>
+              <p style={{ fontSize: '13px', lineHeight: '1.6', marginBottom: '16px' }}>
+                Benchmark protocol vulnerabilities arising when autonomous AI agents invoke external tools and inspect data resources.
+              </p>
+              <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+                <li>• Indirect Prompt Injection via MCP Resources</li>
+                <li>• Broken Tool-Level Authorization (Agentic BFLA)</li>
+                <li>• Tool Argument Injection & Poisoning</li>
+                <li>• Confused Deputy in Multi-Agent Trajectories</li>
+              </ul>
+            </div>
+            <button 
+              className="tech-btn tech-btn-secondary" 
+              style={{ marginTop: '24px', width: '100%' }}
+              onClick={() => navigate('/modules')}
+            >
+              Explore MCP Agentic labs
+            </button>
+          </div>
+        </div>
       </section>
 
-      {/* Bottom Bright Orange Banner */}
-      <section style={{ background: 'var(--brand-orange)', borderRadius: 'var(--radius-md)', padding: '48px 40px', color: '#ffffff' }}>
-        <h2 style={{ fontSize: '36px', fontWeight: '900', marginBottom: '12px', letterSpacing: '-0.5px' }}>
-          Ready to break something on purpose?
+      {/* Scientific Measurement & Ground Truth */}
+      <section style={{
+        maxWidth: '1080px',
+        margin: '0 auto',
+        width: '100%',
+        backgroundColor: 'var(--bg-surface-1)',
+        border: '1px solid var(--border-subtle)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '40px'
+      }}>
+        <div style={{ maxWidth: '720px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '12px' }}>
+            Ground-Truth Evaluation
+          </div>
+          <h2 style={{ fontSize: '28px', marginBottom: '16px' }}>
+            Activity-driven scoring with Hake's Normalized Gain.
+          </h2>
+          <p style={{ fontSize: '14px', lineHeight: '1.6', color: 'var(--text-secondary)', marginBottom: '24px' }}>
+            Unlike platforms that award points for viewing a page, our Oracle Engine inspects actual HTTP and JSON-RPC traffic. The 5-stage workflow measures conceptual knowledge gain before and after practical training.
+          </p>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: '16px',
+          marginTop: '16px'
+        }}>
+          <div style={{ padding: '16px', backgroundColor: 'var(--bg-surface-3)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>1. Baseline Pre-Test</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>8 conceptual domain questions prior to training</div>
+          </div>
+          <div style={{ padding: '16px', backgroundColor: 'var(--bg-surface-3)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>2. Guided Labs</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Docker target exploitation with HTTP builder</div>
+          </div>
+          <div style={{ padding: '16px', backgroundColor: 'var(--bg-surface-3)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>3. Parallel Post-Test</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Equivalent parallel questions measuring gain</div>
+          </div>
+          <div style={{ padding: '16px', backgroundColor: 'var(--bg-surface-3)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>4. Transfer Lab</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Unassisted testing on blind target schemas</div>
+          </div>
+          <div style={{ padding: '16px', backgroundColor: 'var(--bg-surface-3)', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>5. Usability (SUS)</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Standardized platform experience metric</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Role-Based Pathways */}
+      <section style={{ maxWidth: '1080px', margin: '0 auto', width: '100%' }}>
+        <div style={{ marginBottom: '32px' }}>
+          <h2 style={{ fontSize: '28px', marginBottom: '8px' }}>Designed for university and enterprise research</h2>
+          <p>Role-specific workspaces provide tailored telemetry, audit trails, and configuration tools.</p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
+          <div className="tech-card">
+            <span className="tape-strip"></span>
+            <div style={{ fontWeight: '600', fontSize: '15px', marginBottom: '8px' }}>Students & Learners</div>
+            <p style={{ fontSize: '13px', lineHeight: '1.5' }}>
+              Launch guided Docker containers, practice exploitation techniques, and receive adaptive assistance from Qwen AI.
+            </p>
+          </div>
+
+          <div className="tech-card">
+            <span className="thumbtack-pin"></span>
+            <div style={{ fontWeight: '600', fontSize: '15px', marginBottom: '8px' }}>University Instructors</div>
+            <p style={{ fontSize: '13px', lineHeight: '1.5' }}>
+              Track student cohort progress, monitor average normalized knowledge gains, and view live lab completion rates.
+            </p>
+          </div>
+
+          <div className="tech-card">
+            <span className="tape-strip"></span>
+            <div style={{ fontWeight: '600', fontSize: '15px', marginBottom: '8px' }}>Security Assessors</div>
+            <p style={{ fontSize: '13px', lineHeight: '1.5' }}>
+              Inspect immutable HTTP request and response evidence logs to verify genuine exploit mechanics.
+            </p>
+          </div>
+
+          <div className="tech-card">
+            <span className="thumbtack-pin"></span>
+            <div style={{ fontWeight: '600', fontSize: '15px', marginBottom: '8px' }}>AI Researchers</div>
+            <p style={{ fontSize: '13px', lineHeight: '1.5' }}>
+              Benchmark autonomous AI agent tool-calling trajectories against vulnerable MCP v1.0 server endpoints.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Bottom Quiet Callout */}
+      <section style={{
+        maxWidth: '1080px',
+        margin: '0 auto',
+        width: '100%',
+        backgroundColor: 'var(--text-primary)',
+        color: 'var(--text-inverse)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '48px 40px',
+        textAlign: 'center'
+      }}>
+        <h2 style={{ color: 'var(--text-inverse)', fontSize: '32px', marginBottom: '12px' }}>
+          Start training in the laboratory
         </h2>
-        <p style={{ fontSize: '15px', opacity: 0.9, marginBottom: '24px' }}>
-          Sign in or create an account to start your hands-on Docker container labs.
+        <p style={{ color: '#d2d2d7', fontSize: '15px', maxWidth: '520px', margin: '0 auto 28px auto' }}>
+          Create an account to begin the 5-stage conceptual assessment and launch your first containerized exercise.
         </p>
-        <button className="tech-btn tech-btn-primary" style={{ padding: '12px 24px', fontSize: '14px' }} onClick={() => navigate(isAuthenticated ? '/modules' : '/signup')}>
-          {isAuthenticated ? 'Go to Catalog' : 'Create free account'}
+        <button 
+          className="tech-btn tech-btn-accent tech-btn-lg"
+          onClick={() => navigate(isAuthenticated ? '/dashboard' : '/signup')}
+        >
+          {isAuthenticated ? 'Open Student Dashboard' : 'Create academic account'}
         </button>
       </section>
 

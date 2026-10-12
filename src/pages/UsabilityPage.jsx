@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Star, CheckCircle2, ArrowRight, ThumbsUp } from 'lucide-react';
 import { assessmentApi } from '../services/api';
 
 export default function UsabilityPage({ navigate }) {
@@ -44,93 +43,99 @@ export default function UsabilityPage({ navigate }) {
   };
 
   return (
-    <div style={{ maxWidth: '840px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '40px' }}>
+    <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '28px' }}>
       
-      {/* Title Header */}
+      {/* Header */}
       <div>
-        <div className="mono" style={{ fontSize: '11px', color: 'var(--brand-orange)', fontWeight: '700', letterSpacing: '1px', marginBottom: '4px' }}>
-          // STEP 5 OF 5 • SYSTEM USABILITY SCALE (SUS) EVALUATION
+        <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
+          Step 5 of 5 • Usability Benchmark
         </div>
-        <h1 style={{ fontSize: '30px', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.5px' }}>
-          Usability & Feedback Survey
+        <h1 style={{ fontSize: '32px', marginBottom: '8px' }}>
+          System Usability Scale (SUS) Survey
         </h1>
-        <p style={{ fontSize: '13px', color: '#64748b' }}>
-          Please rate your experience using the API security platform, lab environments, and local AI assistant guidance.
+        <p style={{ fontSize: '14px', maxWidth: '640px' }}>
+          Rate your laboratory experience to contribute to institutional benchmarking of the platform interface and guidance tools.
         </p>
       </div>
 
-      {loading ? (
-        <div className="tech-card" style={{ padding: '32px', textAlign: 'center', color: '#64748b' }}>
-          Loading survey questions...
-        </div>
-      ) : completed ? (
-        /* Completion View */
-        <div className="tech-card" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'center', alignItems: 'center' }}>
-          <div style={{ background: '#d1fae5', color: '#059669', width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <ThumbsUp size={32} />
+      {completed ? (
+        <div className="tech-card" style={{ padding: '36px', textAlign: 'center' }}>
+          <div style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            backgroundColor: 'var(--status-success-bg)',
+            color: 'var(--status-success)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 16px auto',
+            fontSize: '22px',
+            fontWeight: '700'
+          }}>
+            ✓
           </div>
-          <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#0f172a' }}>Thank You for Your Feedback!</h2>
-          <p style={{ fontSize: '13px', color: '#64748b', maxWidth: '520px' }}>
-            Your usability ratings and learning gain metrics have been recorded. You have completed all steps of the assessment evaluation workflow.
+          <h2 style={{ fontSize: '24px', marginBottom: '6px' }}>Survey Submitted</h2>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
+            Thank you for completing the 5-stage evaluation workflow. Your feedback has been recorded.
           </p>
-
-          <button className="tech-btn tech-btn-primary" onClick={() => navigate('/dashboard')} style={{ marginTop: '12px' }}>
-            <span>Return to Student Dashboard</span>
-            <ArrowRight size={16} />
+          <button 
+            className="tech-btn tech-btn-primary tech-btn-lg"
+            onClick={() => navigate('/dashboard')}
+          >
+            Return to Dashboard
           </button>
         </div>
       ) : (
-        /* Survey Form */
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {questions.map((q, idx) => (
-            <div key={q.code} className="tech-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span className="tech-badge badge-amber" style={{ fontSize: '11px' }}>STATEMENT {idx + 1} OF {questions.length}</span>
-                <span className="mono" style={{ fontSize: '11px', color: '#64748b' }}>LIKERT 1-5 SCALE</span>
+            <div key={q.code || idx} className="tech-card">
+              <div style={{ fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)', marginBottom: '14px' }}>
+                {idx + 1}. {q.text}
               </div>
-              <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>{q.text}</h3>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', marginTop: '8px' }}>
-                {[
-                  { rating: 1, label: '1 - Strongly Disagree' },
-                  { rating: 2, label: '2 - Disagree' },
-                  { rating: 3, label: '3 - Neutral' },
-                  { rating: 4, label: '4 - Agree' },
-                  { rating: 5, label: '5 - Strongly Agree' }
-                ].map(item => {
-                  const isSelected = responses[q.code] === item.rating;
-                  return (
-                    <button
-                      key={item.rating}
-                      type="button"
-                      onClick={() => handleRatingSelect(q.code, item.rating)}
-                      style={{
-                        padding: '10px 6px',
-                        borderRadius: 'var(--radius-sm)',
-                        border: isSelected ? '2px solid var(--brand-navy)' : '1px solid #e2e8f0',
-                        background: isSelected ? '#fff7ed' : '#ffffff',
-                        color: isSelected ? '#0f172a' : '#475569',
-                        fontWeight: isSelected ? '700' : '500',
-                        fontSize: '11px',
-                        cursor: 'pointer',
-                        textAlign: 'center',
-                        transition: 'all 0.15s ease'
-                      }}
-                    >
-                      {item.label}
-                    </button>
-                  );
-                })}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Strongly Disagree (1)</span>
+                
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  {[1, 2, 3, 4, 5].map(rating => {
+                    const isSelected = responses[q.code] === rating;
+                    return (
+                      <button
+                        key={rating}
+                        type="button"
+                        onClick={() => handleRatingSelect(q.code, rating)}
+                        style={{
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: 'var(--radius-sm)',
+                          backgroundColor: isSelected ? 'var(--text-primary)' : 'var(--bg-surface-3)',
+                          color: isSelected ? 'var(--text-inverse)' : 'var(--text-primary)',
+                          border: '1px solid var(--border-subtle)',
+                          fontWeight: '600',
+                          fontSize: '13px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {rating}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Strongly Agree (5)</span>
               </div>
             </div>
           ))}
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
-            <button type="submit" className="tech-btn tech-btn-primary" disabled={submitting} style={{ padding: '12px 24px', fontSize: '14px' }}>
-              <span>{submitting ? 'Submitting Survey...' : 'Submit Usability Survey'}</span>
-              <ArrowRight size={16} />
-            </button>
-          </div>
+          <button 
+            type="submit" 
+            className="tech-btn tech-btn-primary tech-btn-lg" 
+            disabled={submitting || questions.length === 0}
+            style={{ width: '100%', marginTop: '12px' }}
+          >
+            {submitting ? 'Submitting Responses...' : 'Submit Usability Survey'}
+          </button>
         </form>
       )}
 

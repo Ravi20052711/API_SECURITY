@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Plus, Target, Clock, ShieldCheck, ArrowRight, ExternalLink, Activity, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { exerciseApi, labApi } from '../services/api';
 
 export default function DashboardPage({ navigate }) {
@@ -16,7 +15,7 @@ export default function DashboardPage({ navigate }) {
     active_lab_session: null,
     stats: {
       completed_count: 0,
-      total_exercises: 5,
+      total_exercises: 6,
       completion_rate: 0,
       total_score: 0
     },
@@ -41,7 +40,7 @@ export default function DashboardPage({ navigate }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const stats = dashboardData.stats || { completed_count: 0, total_exercises: 5, completion_rate: 0, total_score: 0 };
+  const stats = dashboardData.stats || { completed_count: 0, total_exercises: 6, completion_rate: 0, total_score: 0 };
   const items = dashboardData.progress_items || [];
   const activeSess = dashboardData.active_lab_session;
   const recentActivity = dashboardData.recent_activity || [];
@@ -58,379 +57,267 @@ export default function DashboardPage({ navigate }) {
         navigate(`/exercise?id=${exId}`);
       }
     } catch (err) {
-      const errMsg = err?.response?.data?.error || "Docker Desktop is not currently running. Please start Docker Desktop and try provisioning the laboratory again.";
+      const errMsg = err?.response?.data?.error || "Docker container service is currently starting. Please verify Docker Desktop is running.";
       setDockerErrorMsg(errMsg);
     } finally {
       setLaunchingExId(null);
     }
   };
 
-  const isBolaDone = items.some(i => i.exercise_id === 'ex-bola-01' && i.status === 'COMPLETED');
-  const isBflaDone = items.some(i => i.exercise_id === 'ex-bfla-01' && i.status === 'COMPLETED');
-  const isMassDone = items.some(i => i.exercise_id === 'ex-mass-01' && i.status === 'COMPLETED');
-  const isSsrfDone = items.some(i => i.exercise_id === 'ex-ssrf-01' && i.status === 'COMPLETED');
-
-  const rBola = isBolaDone ? 75 : 25;
-  const rAuthN = isBflaDone ? 75 : 25;
-  const rMass = isMassDone ? 75 : 25;
-  const rRate = 30;
-  const rBfla = isBflaDone ? 75 : 25;
-  const rSsrf = isSsrfDone ? 75 : 25;
-
-  const polyPoints = `
-    ${100},${100 - rBola} 
-    ${100 + rAuthN * 0.866},${100 - rAuthN * 0.5} 
-    ${100 + rMass * 0.866},${100 + rMass * 0.5} 
-    ${100},${100 + rRate} 
-    ${100 - rBfla * 0.866},${100 + rBfla * 0.5} 
-    ${100 - rSsrf * 0.866},${100 - rSsrf * 0.5}
-  `.replace(/\s+/g, ' ').trim();
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', paddingBottom: '32px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       
-      {/* Docker Error Alert Banner */}
+      {/* Docker Notice if error */}
       {dockerErrorMsg && (
         <div style={{
-          background: '#fee2e2',
-          border: '1px solid #ef4444',
-          color: '#991b1b',
-          padding: '16px 20px',
-          borderRadius: 'var(--radius-md)',
+          padding: '12px 16px',
+          backgroundColor: 'var(--status-danger-bg)',
+          border: '1px solid var(--status-danger-border)',
+          borderRadius: 'var(--radius-sm)',
+          color: 'var(--status-danger)',
           fontSize: '13px',
-          fontWeight: '600',
           display: 'flex',
-          justifySpace: 'space-between',
-          alignItems: 'center',
-          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.15)'
+          justifyContent: 'space-between',
+          alignItems: 'center'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <AlertTriangle size={20} color="#dc2626" />
-            <div>
-              <div style={{ fontWeight: '800', fontSize: '14px' }}>Lab Provisioning Notice</div>
-              <div>{dockerErrorMsg}</div>
-            </div>
+          <div>
+            <strong>Container Provisioning Notice:</strong> {dockerErrorMsg}
           </div>
           <button 
             onClick={() => setDockerErrorMsg(null)}
-            style={{ background: 'none', border: 'none', color: '#991b1b', fontWeight: '800', cursor: 'pointer' }}
+            style={{ background: 'none', border: 'none', color: 'var(--status-danger)', fontWeight: '600', cursor: 'pointer' }}
           >
             Dismiss
           </button>
         </div>
       )}
 
-      {/* Hero Banner Area - TCS XPLORE Art Style */}
-      <div style={{
-        position: 'relative',
-        width: '100%',
-        minHeight: '320px',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        backgroundImage: `linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.2) 100%), url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1600&auto=format&fit=crop')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        padding: '40px 48px',
-        color: '#ffffff',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
-      }}>
-        <div style={{ maxWidth: '640px' }}>
-          <span className="mono" style={{ fontSize: '11px', color: 'var(--brand-orange)', fontWeight: '800', letterSpacing: '1.5px', textTransform: 'uppercase', background: 'rgba(0,0,0,0.6)', padding: '4px 10px', borderRadius: '4px' }}>
-            // OFFICIAL SECURITY LEARNING WORKSPACE
-          </span>
-          
-          <h1 style={{
-            fontSize: '46px',
-            fontWeight: '800',
-            fontFamily: '"Georgia", "Times New Roman", serif, var(--font-sans)',
-            color: '#ffffff',
-            margin: '14px 0 12px 0',
-            lineHeight: '1.1',
-            letterSpacing: '-0.5px'
-          }}>
-            Welcome to HACKTHEAPI
-          </h1>
-
-          <p style={{ fontSize: '15px', color: '#e2e8f0', lineHeight: '1.6', marginBottom: '24px', opacity: 0.95 }}>
-            Interactive OWASP API Security Training Platform for <strong>{currentUser?.name || currentUser?.email || 'Student Hacker'}</strong>. Exploit real vulnerability labs & measure knowledge gain in isolated environments.
-          </p>
-
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <button 
-              className="tech-btn tech-btn-amber"
-              style={{ padding: '12px 24px', fontSize: '14px', fontWeight: '700' }}
-              onClick={() => navigate('/pre-test')}
-            >
-              <span>Start Evaluation Workflow</span>
-              <ArrowRight size={16} />
-            </button>
-            <button 
-              className="tech-btn"
-              style={{ padding: '12px 24px', fontSize: '14px', background: 'rgba(255,255,255,0.15)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.4)', backdropFilter: 'blur(4px)' }}
-              onClick={() => navigate('/modules')}
-            >
-              Explore Lab Catalog
-            </button>
-          </div>
+      {/* Header */}
+      <div>
+        <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
+          Student Benchmarking Hub
         </div>
+        <h1 style={{ fontSize: '32px', marginBottom: '6px' }}>
+          Welcome, {currentUser?.first_name || currentUser?.name || 'Student'}
+        </h1>
+        <p style={{ fontSize: '14px' }}>
+          Workspace account: <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>{currentUser?.email || 'student@university.edu'}</span>
+        </p>
       </div>
 
-      {/* 5-Step Evaluation Workflow Bar */}
-      <div className="tech-card" style={{ padding: '20px 24px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+      {/* 5-Stage Scientific Evaluation Workflow */}
+      <div className="tech-card" style={{ padding: '20px 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
           <div>
-            <span className="mono" style={{ fontSize: '11px', color: 'var(--brand-orange)', fontWeight: '700' }}>// EVALUATION WORKFLOW</span>
-            <h3 style={{ fontSize: '16px', fontWeight: '800', color: '#0f172a', margin: '2px 0 0 0' }}>Pre-Test → Training → Post-Test → Transfer → Usability Flow</h3>
+            <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Evaluation Workflow
+            </div>
+            <h3 style={{ fontSize: '15px', marginTop: '2px' }}>
+              Sequential 5-Stage Knowledge Benchmark
+            </h3>
           </div>
-          <button className="tech-btn tech-btn-sm tech-btn-secondary" onClick={() => navigate('/pre-test')}>
-            <span>Start Step 1: Pre-Test</span>
-            <ArrowRight size={14} />
+          <button 
+            className="tech-btn tech-btn-sm tech-btn-primary"
+            onClick={() => navigate('/pre-test')}
+          >
+            Start Step 1: Pre-Test
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px' }}>
           {[
-            { step: '1. Pre-Test', path: '/pre-test', desc: 'Baseline Assessment' },
-            { step: '2. Training', path: '/training', desc: 'OWASP Hands-on Labs' },
-            { step: '3. Post-Test', path: '/post-test', desc: 'Knowledge Gain' },
-            { step: '4. Transfer', path: '/transfer', desc: 'Blind Target Challenge' },
-            { step: '5. Usability', path: '/usability', desc: 'SUS Platform Feedback' }
+            { step: '1. Pre-Test', path: '/pre-test', desc: 'Baseline conceptual check' },
+            { step: '2. Guided Labs', path: '/modules', desc: 'Docker target exercises' },
+            { step: '3. Post-Test', path: '/post-test', desc: 'Normalized gain measurement' },
+            { step: '4. Transfer Lab', path: '/assessment', desc: 'Blind target schema' },
+            { step: '5. Usability', path: '/usability', desc: 'System usability survey' }
           ].map((item, idx) => (
             <button
               key={idx}
               onClick={() => navigate(item.path)}
               style={{
-                background: '#f8fafc',
-                border: '1px solid #cbd5e1',
-                borderRadius: '8px',
-                padding: '12px 10px',
+                backgroundColor: 'var(--bg-surface-3)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '12px 14px',
                 textAlign: 'left',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease'
+                cursor: 'pointer'
               }}
             >
-              <div style={{ fontSize: '12px', fontWeight: '800', color: '#0f172a' }}>{item.step}</div>
-              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '2px' }}>{item.desc}</div>
+              <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' }}>{item.step}</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{item.desc}</div>
             </button>
           ))}
         </div>
       </div>
 
-      {/* 3 Action Cards with Current Active Lab Status */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+      {/* KPI Cards & Active Lab Launcher */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
         
-        {/* Card 1: Active Lab Session / Continue Lab */}
+        {/* Active Session Launcher */}
         <div 
           onClick={handleContinueActiveLab}
           style={{
-            background: activeSess ? 'var(--brand-navy)' : '#0f172a',
-            color: '#ffffff',
+            backgroundColor: 'var(--text-primary)',
+            color: 'var(--text-inverse)',
             borderRadius: 'var(--radius-md)',
             padding: '24px',
             cursor: 'pointer',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            minHeight: '140px',
-            boxShadow: '0 4px 12px rgba(27, 20, 100, 0.15)',
-            border: activeSess ? '1px solid #3b0764' : '1px solid #334155'
+            minHeight: '140px'
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '18px', fontWeight: '800' }}>▷ Current Active Lab</span>
-            <span className="mono" style={{ fontSize: '11px', background: activeSess ? '#22c55e' : '#64748b', color: '#ffffff', padding: '2px 8px', borderRadius: '4px' }}>
-              {activeSess ? 'IN_PROGRESS' : 'NO ACTIVE LAB'}
+            <span style={{ fontSize: '14px', fontWeight: '600' }}>Active Container Session</span>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: '600',
+              padding: '2px 8px',
+              borderRadius: 'var(--radius-xs)',
+              backgroundColor: activeSess ? 'var(--status-success)' : 'rgba(255,255,255,0.2)',
+              color: '#ffffff'
+            }}>
+              {activeSess ? 'IN_PROGRESS' : 'READY TO START'}
             </span>
           </div>
+
           <div>
-            <div style={{ fontSize: '15px', fontWeight: '800', marginBottom: '4px' }}>
-              {launchingExId ? 'Checking Docker & Provisioning Container...' : (activeSess?.title || 'Click to launch lab catalog')}
+            <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>
+              {launchingExId ? 'Provisioning container...' : (activeSess?.title || 'Launch Guided Lab Workbench')}
             </div>
-            <div style={{ fontSize: '12px', opacity: 0.85 }} className="mono">
-              {activeSess ? `Port ${activeSess.port} • Timer Active` : 'Select a lab to start isolated container'}
+            <div style={{ fontSize: '12px', color: '#a1a1a6' }}>
+              {activeSess ? `Port ${activeSess.port} • Timer active` : 'Select an exercise to initialize Docker environment'}
             </div>
           </div>
         </div>
 
-        {/* Card 2: Vulnerability Training Catalog */}
-        <div 
-          className="tech-card"
-          onClick={() => navigate('/modules')}
-          style={{
-            padding: '24px',
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '140px'
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a' }}>⚡ Training Catalog</span>
-            <ArrowRight size={18} color="#64748b" />
+        {/* KPI: Technique Transfer */}
+        <div className="tech-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <span className="tape-strip"></span>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            Technique Transfer Score
           </div>
           <div>
-            <div style={{ fontSize: '14px', fontWeight: '700', color: '#0f172a', marginBottom: '4px' }}>
-              OWASP Top 10 Guided Labs
+            <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--text-primary)' }}>
+              {stats.total_score > 0 ? `${stats.total_score} pts` : '0 pts'}
             </div>
-            <div style={{ fontSize: '12px', color: '#64748b' }}>
-              {stats.completed_count} of {stats.total_exercises} exercises completed
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
+              Based on ground-truth Oracle verifications
             </div>
           </div>
         </div>
 
-        {/* Card 3: Unfamiliar API Transfer Assessment */}
-        <div 
-          className="tech-card"
-          onClick={() => navigate('/assessment')}
-          style={{
-            padding: '24px',
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: '140px'
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a' }}>🎯 Transfer Lab</span>
-            <Target size={18} color="var(--brand-orange)" />
+        {/* KPI: Completion Rate */}
+        <div className="tech-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <span className="thumbtack-pin"></span>
+          <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            Curriculum Completion
           </div>
           <div>
-            <div style={{ fontSize: '14px', fontWeight: '700', color: '#0f172a', marginBottom: '4px' }}>
-              Unfamiliar API Assessment
+            <div style={{ fontSize: '32px', fontWeight: '700', color: 'var(--text-primary)' }}>
+              {stats.completion_rate}%
             </div>
-            <div style={{ fontSize: '12px', color: '#64748b' }}>
-              Test skill transfer on blind target schemas
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>
+              {stats.completed_count} of {stats.total_exercises} laboratory modules completed
             </div>
           </div>
         </div>
 
       </div>
 
-      {/* Main Grid: User Specific Progress & Activity */}
+      {/* Main Grid: Progress Table & Competency Breakdown */}
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
         
-        {/* Left Column: Progress Items & Earned Badges */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
-          {/* Progress Overview Table */}
-          <div className="tech-card" style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a' }}>Exercise Completion Progress</h2>
-              <span className="mono" style={{ fontSize: '12px', fontWeight: '700', color: 'var(--brand-navy)' }}>
-                Overall: {stats.completion_rate}% ({stats.completed_count}/{stats.total_exercises})
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {items.map(item => (
-                <div 
-                  key={item.exercise_id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '14px 18px',
-                    borderRadius: 'var(--radius-sm)',
-                    background: item.status === 'COMPLETED' ? '#f0fdf4' : item.status === 'IN_PROGRESS' ? '#fffbeb' : '#f8fafc',
-                    border: item.status === 'COMPLETED' ? '1px solid #bbf7d0' : item.status === 'IN_PROGRESS' ? '1px solid #fef08a' : '1px solid #e2e8f0'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{
-                      width: '28px',
-                      height: '28px',
-                      borderRadius: '50%',
-                      background: item.status === 'COMPLETED' ? '#16a34a' : item.status === 'IN_PROGRESS' ? '#d97706' : '#cbd5e1',
-                      color: '#ffffff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '12px',
-                      fontWeight: '800'
-                    }}>
-                      {item.status === 'COMPLETED' ? '✓' : item.status === 'IN_PROGRESS' ? '▶' : '•'}
-                    </div>
-                    <div>
-                      <div className="mono" style={{ fontSize: '10px', color: '#64748b' }}>{item.lab_id} • {item.owasp}</div>
-                      <div style={{ fontSize: '13.5px', fontWeight: '700', color: '#0f172a' }}>{item.title}</div>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <span className="mono" style={{ fontSize: '12px', fontWeight: '700', color: '#0f172a' }}>
-                      {item.score} pts
-                    </span>
-                    <button 
-                      className={`tech-btn tech-btn-sm ${item.status === 'COMPLETED' ? 'tech-btn-secondary' : 'tech-btn-primary'}`}
-                      onClick={() => navigate(`/exercise?id=${item.exercise_id}`)}
-                    >
-                      {item.status === 'COMPLETED' ? 'Review' : item.status === 'IN_PROGRESS' ? 'Resume' : 'Start'}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+        {/* Left Column: Progress Table */}
+        <div className="tech-card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2 style={{ fontSize: '18px' }}>Module progress & execution status</h2>
+            <button 
+              className="tech-btn tech-btn-sm tech-btn-secondary"
+              onClick={() => navigate('/modules')}
+            >
+              View catalog
+            </button>
           </div>
 
-          {/* User Earned Badges */}
-          <div className="tech-card" style={{ padding: '24px' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a', marginBottom: '16px' }}>Earned Security Badges</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
-              {(dashboardData.badges || []).map(b => (
-                <div 
-                  key={b.id} 
-                  style={{
-                    padding: '16px',
-                    borderRadius: '8px',
-                    textAlign: 'center',
-                    background: b.unlocked ? '#eff6ff' : '#f8fafc',
-                    border: b.unlocked ? '1px solid #bfdbfe' : '1px solid #e2e8f0',
-                    opacity: b.unlocked ? 1 : 0.5
-                  }}
-                >
-                  <div style={{ fontSize: '24px', marginBottom: '6px' }}>{b.unlocked ? '🏆' : '🔒'}</div>
-                  <div style={{ fontSize: '12px', fontWeight: '800', color: b.unlocked ? '#1e40af' : '#64748b' }}>{b.name}</div>
-                  <div className="mono" style={{ fontSize: '9px', color: '#94a3b8', marginTop: '2px' }}>{b.unlocked ? 'UNLOCKED' : 'LOCKED'}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {items.map(item => (
+              <div 
+                key={item.exercise_id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '12px 16px',
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: 'var(--bg-surface-2)',
+                  border: '1px solid var(--border-subtle)'
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{item.lab_id} • {item.owasp}</div>
+                  <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', marginTop: '2px' }}>{item.title}</div>
                 </div>
-              ))}
-            </div>
-          </div>
 
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: '500',
+                    padding: '2px 8px',
+                    borderRadius: 'var(--radius-xs)',
+                    backgroundColor: item.status === 'COMPLETED' ? 'var(--status-success-bg)' : 'var(--bg-surface-3)',
+                    color: item.status === 'COMPLETED' ? 'var(--status-success)' : 'var(--text-secondary)'
+                  }}>
+                    {item.status === 'COMPLETED' ? 'Verified' : 'Pending'}
+                  </span>
+                  <button 
+                    className={`tech-btn tech-btn-sm ${item.status === 'COMPLETED' ? 'tech-btn-secondary' : 'tech-btn-primary'}`}
+                    onClick={() => navigate(`/exercise?id=${item.exercise_id}`)}
+                  >
+                    {item.status === 'COMPLETED' ? 'Review' : 'Launch'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Right Column: User Skill Radar & Activity Stream */}
+        {/* Right Column: Activity Stream & Research Badges */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
-          {/* Skill Radar Card */}
-          <div className="tech-card" style={{ padding: '24px', textAlign: 'center' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: '800', color: '#0f172a', marginBottom: '12px' }}>Vulnerability Competency Radar</h3>
-            <svg width="200" height="200" style={{ margin: '0 auto' }}>
-              <polygon points="100,25 165,62 165,138 100,175 35,138 35,62" fill="none" stroke="#e2e8f0" strokeWidth="1" />
-              <polygon points="100,50 143,75 143,125 100,150 57,125 57,75" fill="none" stroke="#e2e8f0" strokeWidth="1" />
-              <polygon points="100,75 121,87 121,113 100,125 79,113 79,87" fill="none" stroke="#e2e8f0" strokeWidth="1" />
-              <polygon points={polyPoints} fill="rgba(27, 20, 100, 0.2)" stroke="#1b1464" strokeWidth="2" />
-            </svg>
-            <div style={{ fontSize: '11px', color: '#64748b', marginTop: '8px' }}>
-              Calculated dynamically from target completions
+          {/* Research Competency */}
+          <div className="tech-card">
+            <span className="tape-strip"></span>
+            <h3 style={{ fontSize: '15px', marginBottom: '12px' }}>Competency coverage</h3>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+              Covers OWASP API Security Top 10 (BOLA, BOPLA, BFLA, SSRF) and Model Context Protocol (MCP v1.0) agentic tool injection flaws.
+            </div>
+            <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '6px' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Verified attempts</span>
+                <span style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{stats.completed_count}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Oracle state verifications</span>
+                <span style={{ fontWeight: '600', color: 'var(--status-success)' }}>Active</span>
+              </div>
             </div>
           </div>
 
-          {/* User Recent Activity Stream */}
-          <div className="tech-card" style={{ padding: '24px' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: '800', color: '#0f172a', marginBottom: '16px' }}>Personal Activity Stream</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {/* Recent Activity */}
+          <div className="tech-card">
+            <span className="thumbtack-pin"></span>
+            <h3 style={{ fontSize: '15px', marginBottom: '12px' }}>Session history</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {recentActivity.length === 0 ? (
-                <div style={{ fontSize: '12px', color: '#94a3b8' }}>No recent lab sessions.</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>No recent sessions recorded.</div>
               ) : (
                 recentActivity.map(act => (
-                  <div key={act.sessionId} style={{ fontSize: '12px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
-                    <div style={{ fontWeight: '700', color: '#0f172a' }}>{act.title}</div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#64748b', marginTop: '2px' }} className="mono">
+                  <div key={act.sessionId} style={{ fontSize: '12px', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '8px' }}>
+                    <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{act.title}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)', marginTop: '2px', fontSize: '11px' }}>
                       <span>Status: {act.status}</span>
                       <span>{act.timestamp}</span>
                     </div>

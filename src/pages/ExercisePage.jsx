@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Pause, Play, Square, Trash2, CheckCircle2, HelpCircle, FileText, Globe, Terminal, ShieldAlert, Monitor, ArrowRight, ExternalLink } from 'lucide-react';
 import { exerciseApi, labApi, oracleApi } from '../services/api';
 
 export default function ExercisePage({ navigate }) {
@@ -41,9 +40,8 @@ export default function ExercisePage({ navigate }) {
   const [requestHeaders, setRequestHeaders] = useState('Content-Type: application/json\nAuthorization: Bearer token_wiener_access_granted_9941');
   const [requestBody, setRequestBody] = useState('{\n  "reason": "Administrative deletion request"\n}');
   const [responseStatus, setResponseStatus] = useState(null);
-  const [responseOutput, setResponseOutput] = useState('Send a request to inspect the live container HTTP response.');
+  const [responseOutput, setResponseOutput] = useState('Execute a request to view live container HTTP telemetry.');
   const [loading, setLoading] = useState(false);
-  const [hintRevealed, setHintRevealed] = useState(false);
 
   // 20-Minute Backend Timer & Pause Management
   const [remainingSeconds, setRemainingSeconds] = useState(1200);
@@ -113,10 +111,8 @@ export default function ExercisePage({ navigate }) {
       setRequestBody('{\n  "reason": "Administrative deletion request"\n}');
     }
 
-    // Determine Host Dynamically
     const currentHost = typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? window.location.hostname : 'localhost';
 
-    // Call Backend to Load Challenge Config & Dedicated Container
     labApi.startLab(exId, currentUser?.email || 'student@lab.dev')
       .then(sess => {
         if (sess) {
@@ -138,7 +134,7 @@ export default function ExercisePage({ navigate }) {
     };
   }, []);
 
-  // Backend Timer Loop
+  // Timer Loop
   useEffect(() => {
     if (!sessionId || isPaused || isExpired) return;
 
@@ -172,14 +168,12 @@ export default function ExercisePage({ navigate }) {
     };
   }, [sessionId, isPaused, isExpired]);
 
-  // Format Timer MM:SS
   const formatTimer = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  // Pause / Resume Policy
   const handleTogglePause = async () => {
     if (!sessionId) return;
     if (isPaused) {
@@ -201,7 +195,6 @@ export default function ExercisePage({ navigate }) {
     }
   };
 
-  // Stop Container (Save Progress & Return to Dashboard)
   const handleStopLab = async () => {
     try {
       await labApi.stopLab(exerciseId);
@@ -209,7 +202,6 @@ export default function ExercisePage({ navigate }) {
     navigate('/dashboard');
   };
 
-  // Delete Container (Wipe Container State & Return)
   const handleDeleteContainer = async () => {
     try {
       await labApi.stopLab(exerciseId);
@@ -217,7 +209,6 @@ export default function ExercisePage({ navigate }) {
     navigate('/modules');
   };
 
-  // Auto Submit on Timer Expiry
   const handleAutoSubmit = async () => {
     setIsExpired(true);
     try {
@@ -237,7 +228,6 @@ export default function ExercisePage({ navigate }) {
     }
   };
 
-  // Execute Live HTTP Request via Request Builder
   const handleSendRequest = async () => {
     setLoading(true);
     setResponseStatus(null);
@@ -277,7 +267,6 @@ export default function ExercisePage({ navigate }) {
     }
   };
 
-  // Manual Verification Submission
   const handleVerifyLab = async () => {
     setLoading(true);
     try {
@@ -297,7 +286,7 @@ export default function ExercisePage({ navigate }) {
       setVerificationResult({
         verified: false,
         status: 'FAIL',
-        message: 'Verification check failed. Ensure target user deletion or payload manipulation was executed cleanly.'
+        message: 'Verification check failed. Ensure target state mutation was executed cleanly.'
       });
     } finally {
       setLoading(false);
@@ -305,516 +294,285 @@ export default function ExercisePage({ navigate }) {
   };
 
   return (
-    <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', background: '#090d16', color: '#f8fafc', overflow: 'hidden' }}>
+    <div style={{
+      width: '100vw',
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      backgroundColor: 'var(--bg-canvas)',
+      color: 'var(--text-primary)',
+      overflow: 'hidden'
+    }}>
       
-      {/* EXERCISE TOP CONTROL BAR */}
+      {/* Workbench Header */}
       <header style={{
-        height: '56px',
-        background: '#0f172a',
-        borderBottom: '1px solid #1e293b',
+        height: '52px',
+        backgroundColor: 'var(--bg-surface-1)',
+        borderBottom: '1px solid var(--border-subtle)',
         display: 'flex',
         alignItems: 'center',
-        justify: 'space-between',
+        justifyContent: 'space-between',
         padding: '0 20px',
         flexShrink: 0
       }}>
-        {/* Left Info & Title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div className="mono" style={{ background: '#ff9800', color: '#000000', padding: '4px 10px', borderRadius: '4px', fontSize: '13px', fontWeight: '800' }}>
-            &gt;_ {challenge.lab_id}
-          </div>
+        {/* Left: Challenge Info */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span style={{
+            fontSize: '11px',
+            fontWeight: '600',
+            backgroundColor: 'var(--text-primary)',
+            color: 'var(--text-inverse)',
+            padding: '3px 8px',
+            borderRadius: 'var(--radius-xs)',
+            fontFamily: 'var(--font-mono)'
+          }}>
+            {challenge.lab_id}
+          </span>
           <div>
-            <div style={{ fontSize: '14px', fontWeight: '800', color: '#ffffff' }}>
+            <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' }}>
               {challenge.title}
             </div>
-            <div className="mono" style={{ fontSize: '11px', color: '#94a3b8' }}>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
               {challenge.owasp}
             </div>
           </div>
         </div>
 
-        {/* Center Timer & Security Banner */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        {/* Center: Timer & Mode */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div style={{
-            background: isPaused ? '#f59e0b' : '#0284c7',
-            color: '#ffffff',
-            padding: '6px 14px',
-            borderRadius: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            fontSize: '13px',
-            fontWeight: '800'
-          }} className="mono">
-            <Clock size={16} />
-            <span>TIME REMAINING {formatTimer(remainingSeconds)}</span>
+            fontSize: '12px',
+            fontWeight: '600',
+            fontFamily: 'var(--font-mono)',
+            padding: '4px 10px',
+            borderRadius: 'var(--radius-sm)',
+            backgroundColor: isPaused ? 'var(--status-warning-bg)' : 'var(--bg-surface-3)',
+            color: isPaused ? 'var(--status-warning)' : 'var(--text-primary)',
+            border: '1px solid var(--border-subtle)'
+          }}>
+            Time remaining: {formatTimer(remainingSeconds)}
           </div>
-
-          <div style={{ background: '#059669', color: '#ffffff', padding: '4px 10px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }} className="mono">
-            🛡️ FULLSCREEN MANDATORY
-          </div>
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: '500' }}>
+            Fullscreen active
+          </span>
         </div>
 
-        {/* Right Session Control Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Right: Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button 
             onClick={handleTogglePause}
-            className="tech-btn tech-btn-secondary"
-            style={{ padding: '6px 12px', fontSize: '12px', background: '#1e293b', color: '#ffffff', border: '1px solid #334155' }}
+            className="tech-btn tech-btn-sm tech-btn-secondary"
           >
-            {isPaused ? <Play size={14} /> : <Pause size={14} />}
-            <span>{isPaused ? 'Resume' : 'Pause'}</span>
+            {isPaused ? 'Resume' : 'Pause'}
           </button>
-
           <button 
             onClick={() => setShowStopModal(true)}
-            className="tech-btn tech-btn-secondary"
-            style={{ padding: '6px 12px', fontSize: '12px', background: '#1e293b', color: '#ffffff', border: '1px solid #334155' }}
+            className="tech-btn tech-btn-sm tech-btn-secondary"
           >
-            <Square size={14} />
-            <span>Stop Lab</span>
+            Stop lab
           </button>
-
           <button 
             onClick={() => setShowDeleteModal(true)}
-            className="tech-btn"
-            style={{ padding: '6px 12px', fontSize: '12px', background: '#ef4444', color: '#ffffff', border: 'none' }}
+            className="tech-btn tech-btn-sm"
+            style={{ backgroundColor: 'transparent', color: 'var(--status-danger)', borderColor: 'var(--status-danger-border)' }}
           >
-            <Trash2 size={14} />
-            <span>Delete Container</span>
+            Delete container
           </button>
         </div>
       </header>
 
-      {/* WORKSPACE NAVIGATION TAB BAR */}
+      {/* Workspace Tab Bar */}
       <div style={{
-        background: '#0f172a',
-        borderBottom: '1px solid #1e293b',
+        backgroundColor: 'var(--bg-surface-1)',
+        borderBottom: '1px solid var(--border-subtle)',
         display: 'flex',
         padding: '0 20px',
-        gap: '4px',
+        gap: '2px',
         flexShrink: 0
       }}>
-        <button 
-          onClick={() => setActiveTab('brief')}
-          style={{
-            padding: '12px 18px',
-            background: activeTab === 'brief' ? '#1e293b' : 'transparent',
-            color: activeTab === 'brief' ? '#ff9800' : '#94a3b8',
-            border: 'none',
-            borderBottom: activeTab === 'brief' ? '2px solid #ff9800' : 'none',
-            fontWeight: '700',
-            fontSize: '13px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
-        >
-          <FileText size={15} />
-          <span>📌 Challenge Brief & Objective</span>
-        </button>
-
-        <button 
-          onClick={() => setActiveTab('target_app')}
-          style={{
-            padding: '12px 18px',
-            background: activeTab === 'target_app' ? '#1e293b' : 'transparent',
-            color: activeTab === 'target_app' ? '#ff9800' : '#94a3b8',
-            border: 'none',
-            borderBottom: activeTab === 'target_app' ? '2px solid #ff9800' : 'none',
-            fontWeight: '700',
-            fontSize: '13px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
-        >
-          <Globe size={15} />
-          <span>🌐 Vulnerable Web App ({challenge.type})</span>
-        </button>
-
-        <button 
-          onClick={() => setActiveTab('request_builder')}
-          style={{
-            padding: '12px 18px',
-            background: activeTab === 'request_builder' ? '#1e293b' : 'transparent',
-            color: activeTab === 'request_builder' ? '#ff9800' : '#94a3b8',
-            border: 'none',
-            borderBottom: activeTab === 'request_builder' ? '2px solid #ff9800' : 'none',
-            fontWeight: '700',
-            fontSize: '13px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
-        >
-          <Terminal size={15} />
-          <span>⚡ HTTP Request Builder Workspace</span>
-        </button>
-
-        <button 
-          onClick={() => setActiveTab('verification')}
-          style={{
-            padding: '12px 18px',
-            background: activeTab === 'verification' ? '#1e293b' : 'transparent',
-            color: activeTab === 'verification' ? '#ff9800' : '#94a3b8',
-            border: 'none',
-            borderBottom: activeTab === 'verification' ? '2px solid #ff9800' : 'none',
-            fontWeight: '700',
-            fontSize: '13px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
-        >
-          <CheckCircle2 size={15} />
-          <span>🛡️ Server-Side Verification</span>
-        </button>
+        {[
+          { id: 'brief', label: 'Challenge Brief' },
+          { id: 'target_app', label: 'Target Service & Endpoints' },
+          { id: 'request_builder', label: 'HTTP Request Builder' },
+          { id: 'verification', label: 'Oracle Verification' }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              padding: '10px 16px',
+              background: 'none',
+              border: 'none',
+              borderBottom: activeTab === tab.id ? '2px solid var(--accent-primary)' : '2px solid transparent',
+              fontSize: '13px',
+              fontWeight: activeTab === tab.id ? '600' : '400',
+              color: activeTab === tab.id ? 'var(--text-primary)' : 'var(--text-secondary)',
+              cursor: 'pointer'
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* MAIN LAB WORKSPACE BODY */}
-      <main style={{ flex: 1, padding: '24px', background: '#090d16', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+      {/* Main Workspace Body */}
+      <main style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
         
-        {/* TAB 1: DYNAMIC CHALLENGE BRIEF & INSTRUCTIONS */}
+        {/* TAB 1: BRIEF */}
         {activeTab === 'brief' && (
-          <div style={{ maxWidth: '960px', margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '32px' }}>
-              
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <span className="tech-badge badge-amber">{challenge.owasp}</span>
-                <span className="tech-badge badge-cyan">{challenge.difficulty}</span>
+          <div style={{ maxWidth: '820px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div className="tech-card">
+              <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase', marginBottom: '8px' }}>
+                Laboratory Brief
               </div>
-
-              <h2 style={{ fontSize: '24px', fontWeight: '900', color: '#ffffff', marginBottom: '16px' }}>
-                {challenge.title}
-              </h2>
-
-              <p style={{ fontSize: '14px', color: '#cbd5e1', lineHeight: '1.6', marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '20px', marginBottom: '12px' }}>{challenge.title}</h2>
+              <p style={{ fontSize: '14px', lineHeight: '1.6', marginBottom: '20px' }}>
                 {challenge.problem_statement}
               </p>
 
-              <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '8px', padding: '20px', marginBottom: '24px' }}>
-                <h4 className="mono" style={{ fontSize: '12px', color: '#ff9800', fontWeight: '800', marginBottom: '8px' }}>
-                  🎯 PRIMARY LAB OBJECTIVE:
-                </h4>
-                <p style={{ fontSize: '13px', color: '#f8fafc', lineHeight: '1.5' }}>
+              <div style={{
+                backgroundColor: 'var(--bg-surface-3)',
+                padding: '16px',
+                borderRadius: 'var(--radius-sm)',
+                marginBottom: '20px'
+              }}>
+                <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                  Target Objective:
+                </div>
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
                   {challenge.objective}
-                </p>
+                </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-                <div style={{ background: '#0f172a', padding: '14px', borderRadius: '6px', border: '1px solid #334155' }}>
-                  <div className="mono" style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '700' }}>TARGET CONTAINER URL</div>
-                  <div className="mono" style={{ fontSize: '13px', color: '#4ade80', fontWeight: '700', marginTop: '4px' }}>{targetUrl}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '24px' }}>
+                <div style={{ padding: '12px', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Target Container Address</div>
+                  <div style={{ fontSize: '13px', fontWeight: '600', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{targetUrl}</div>
                 </div>
-
-                <div style={{ background: '#0f172a', padding: '14px', borderRadius: '6px', border: '1px solid #334155' }}>
-                  <div className="mono" style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '700' }}>YOUR SESSION CREDENTIALS</div>
-                  <div className="mono" style={{ fontSize: '13px', color: '#38bdf8', fontWeight: '700', marginTop: '4px' }}>
+                <div style={{ padding: '12px', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-sm)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Session Account</div>
+                  <div style={{ fontSize: '13px', fontWeight: '600', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
                     {challenge.authenticated_user} : {challenge.credentials?.password || 'peter'}
                   </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button className="tech-btn tech-btn-amber" onClick={() => setActiveTab('target_app')}>
-                  <span>Launch Vulnerable Web App &rarr;</span>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button className="tech-btn tech-btn-primary" onClick={() => setActiveTab('request_builder')}>
+                  Open HTTP Request Builder
                 </button>
-                <button className="tech-btn tech-btn-secondary" style={{ background: '#0f172a', color: '#ffffff', border: '1px solid #334155' }} onClick={() => setActiveTab('request_builder')}>
-                  <span>Open HTTP Request Builder Workspace</span>
+                <button className="tech-btn tech-btn-secondary" onClick={() => setActiveTab('target_app')}>
+                  View Target Endpoints
                 </button>
               </div>
-
             </div>
           </div>
         )}
 
-        {/* TAB 2: VULNERABLE WEB APP EXPLORER & API SPEC WORKBENCH */}
+        {/* TAB 2: TARGET SERVICE & ENDPOINTS */}
         {activeTab === 'target_app' && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
-            
-            {/* Top Container Status Bar */}
-            <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Globe size={16} style={{ color: '#38bdf8' }} />
-                <span className="mono" style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '700' }}>TARGET SERVICE PORT:</span>
-                <span className="mono" style={{ fontSize: '12px', color: '#4ade80', fontWeight: '700' }}>:{assignedPort} ({challenge.owasp})</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '11px', color: '#4ade80', fontWeight: '700', background: 'rgba(74, 222, 128, 0.1)', padding: '4px 8px', borderRadius: '4px', border: '1px solid rgba(74, 222, 128, 0.2)' }}>
-                  🟢 Live Container Active
-                </span>
-              </div>
-            </div>
-
-            {/* Container Explorer Area */}
-            <div style={{ flex: 1, background: '#0f172a', border: '1px solid #334155', borderRadius: '8px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', minHeight: '450px' }}>
-              
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #334155', paddingBottom: '16px' }}>
+          <div style={{ maxWidth: '880px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="tech-card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <div>
-                  <h3 style={{ fontSize: '16px', fontWeight: '800', color: '#ffffff', marginBottom: '4px' }}>
-                    🌐 Vulnerable Web App - OpenAPI & Endpoint Console
-                  </h3>
-                  <p style={{ fontSize: '12px', color: '#94a3b8' }}>
-                    Inspect active endpoints, payloads, and target parameters for challenge <strong>{challenge.lab_id}</strong>
-                  </p>
+                  <h3 style={{ fontSize: '16px' }}>Target Container Service</h3>
+                  <p style={{ fontSize: '12px' }}>Container Port: {assignedPort} • Active environment</p>
                 </div>
-                
-                <button className="tech-btn tech-btn-amber" onClick={() => setActiveTab('request_builder')}>
-                  <span>Open Request Builder &rarr;</span>
+                <button className="tech-btn tech-btn-sm tech-btn-primary" onClick={() => setActiveTab('request_builder')}>
+                  Open in Request Builder
                 </button>
               </div>
 
-              {/* Endpoint Spec Card */}
-              <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', padding: '16px' }}>
-                <div className="mono" style={{ fontSize: '11px', color: '#38bdf8', fontWeight: '700', marginBottom: '12px' }}>
-                  // DISCOVERED API ENDPOINTS FOR THIS LAB ({challenge.owasp})
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0f172a', padding: '10px 14px', borderRadius: '6px', border: '1px solid #334155' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span className="tech-badge badge-green" style={{ fontSize: '10px' }}>GET</span>
-                      <span className="mono" style={{ fontSize: '12px', color: '#f8fafc' }}>/api/v1/users/me</span>
-                    </div>
-                    <span style={{ fontSize: '11px', color: '#94a3b8' }}>Returns authenticated user profile</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '12px 14px',
+                  backgroundColor: 'var(--bg-surface-2)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-sm)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span className="tech-badge badge-green">GET</span>
+                    <span style={{ fontSize: '13px', fontFamily: 'var(--font-mono)' }}>/api/v1/users/me</span>
                   </div>
-
-                  {exerciseId === 'ex-bfla-01' && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0f172a', padding: '10px 14px', borderRadius: '6px', border: '1px solid #ef4444' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span className="tech-badge badge-red" style={{ fontSize: '10px' }}>DELETE</span>
-                        <span className="mono" style={{ fontSize: '12px', color: '#f8fafc' }}>/api/v1/users/carlos</span>
-                      </div>
-                      <button 
-                        className="tech-btn tech-btn-amber tech-btn-sm" 
-                        onClick={() => {
-                          setMethod('DELETE');
-                          setEndpoint('/api/v1/users/carlos');
-                          setActiveTab('request_builder');
-                        }}
-                      >
-                        Load Payload into Builder &rarr;
-                      </button>
-                    </div>
-                  )}
-
-                  {exerciseId === 'ex-bola-01' && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0f172a', padding: '10px 14px', borderRadius: '6px', border: '1px solid #ef4444' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span className="tech-badge badge-amber" style={{ fontSize: '10px' }}>GET</span>
-                        <span className="mono" style={{ fontSize: '12px', color: '#f8fafc' }}>/api/v1/invoices/INV-888</span>
-                      </div>
-                      <button 
-                        className="tech-btn tech-btn-amber tech-btn-sm" 
-                        onClick={() => {
-                          setMethod('GET');
-                          setEndpoint('/api/v1/invoices/INV-888');
-                          setActiveTab('request_builder');
-                        }}
-                      >
-                        Load Payload into Builder &rarr;
-                      </button>
-                    </div>
-                  )}
-
-                  {exerciseId === 'ex-mass-01' && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0f172a', padding: '10px 14px', borderRadius: '6px', border: '1px solid #ef4444' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span className="tech-badge badge-amber" style={{ fontSize: '10px' }}>PATCH</span>
-                        <span className="mono" style={{ fontSize: '12px', color: '#f8fafc' }}>/api/v1/users/profile</span>
-                      </div>
-                      <button 
-                        className="tech-btn tech-btn-amber tech-btn-sm" 
-                        onClick={() => {
-                          setMethod('PATCH');
-                          setEndpoint('/api/v1/users/profile');
-                          setRequestBody('{\n  "role": "administrator"\n}');
-                          setActiveTab('request_builder');
-                        }}
-                      >
-                        Load Payload into Builder &rarr;
-                      </button>
-                    </div>
-                  )}
-
-                  {exerciseId === 'ex-ssrf-01' && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0f172a', padding: '10px 14px', borderRadius: '6px', border: '1px solid #ef4444' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span className="tech-badge badge-red" style={{ fontSize: '10px' }}>GET</span>
-                        <span className="mono" style={{ fontSize: '12px', color: '#f8fafc' }}>/api/v1/fetch?url=http://169.254.169.254</span>
-                      </div>
-                      <button 
-                        className="tech-btn tech-btn-amber tech-btn-sm" 
-                        onClick={() => {
-                          setMethod('GET');
-                          setEndpoint('/api/v1/fetch?url=http://169.254.169.254');
-                          setActiveTab('request_builder');
-                        }}
-                      >
-                        Load Payload into Builder &rarr;
-                      </button>
-                    </div>
-                  )}
-
-                  {exerciseId === 'ex-sqli-01' && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0f172a', padding: '10px 14px', borderRadius: '6px', border: '1px solid #ef4444' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span className="tech-badge badge-red" style={{ fontSize: '10px' }}>GET</span>
-                        <span className="mono" style={{ fontSize: '12px', color: '#f8fafc' }}>/api/v1/users/search?q=' OR '1'='1</span>
-                      </div>
-                      <button 
-                        className="tech-btn tech-btn-amber tech-btn-sm" 
-                        onClick={() => {
-                          setMethod('GET');
-                          setEndpoint("/api/v1/users/search?q=' OR '1'='1");
-                          setActiveTab('request_builder');
-                        }}
-                      >
-                        Load Payload into Builder &rarr;
-                      </button>
-                    </div>
-                  )}
-
-                  {exerciseId === 'ex-cors-01' && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0f172a', padding: '10px 14px', borderRadius: '6px', border: '1px solid #ef4444' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span className="tech-badge badge-amber" style={{ fontSize: '10px' }}>GET</span>
-                        <span className="mono" style={{ fontSize: '12px', color: '#f8fafc' }}>/api/v1/user/sensitive-token</span>
-                      </div>
-                      <button 
-                        className="tech-btn tech-btn-amber tech-btn-sm" 
-                        onClick={() => {
-                          setMethod('GET');
-                          setEndpoint('/api/v1/user/sensitive-token');
-                          setRequestHeaders('Origin: https://attacker.com\nContent-Type: application/json');
-                          setActiveTab('request_builder');
-                        }}
-                      >
-                        Load Payload into Builder &rarr;
-                      </button>
-                    </div>
-                  )}
-
-                  {exerciseId === 'ex-cmdi-01' && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0f172a', padding: '10px 14px', borderRadius: '6px', border: '1px solid #ef4444' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span className="tech-badge badge-red" style={{ fontSize: '10px' }}>POST</span>
-                        <span className="mono" style={{ fontSize: '12px', color: '#f8fafc' }}>/api/v1/export/pdf</span>
-                      </div>
-                      <button 
-                        className="tech-btn tech-btn-amber tech-btn-sm" 
-                        onClick={() => {
-                          setMethod('POST');
-                          setEndpoint('/api/v1/export/pdf');
-                          setRequestBody('{\n  "filename": "report.pdf; cat /etc/passwd"\n}');
-                          setActiveTab('request_builder');
-                        }}
-                      >
-                        Load Payload into Builder &rarr;
-                      </button>
-                    </div>
-                  )}
-
-                  {exerciseId === 'ex-xxe-01' && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0f172a', padding: '10px 14px', borderRadius: '6px', border: '1px solid #ef4444' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span className="tech-badge badge-red" style={{ fontSize: '10px' }}>POST</span>
-                        <span className="mono" style={{ fontSize: '12px', color: '#f8fafc' }}>/api/v1/xml/parse</span>
-                      </div>
-                      <button 
-                        className="tech-btn tech-btn-amber tech-btn-sm" 
-                        onClick={() => {
-                          setMethod('POST');
-                          setEndpoint('/api/v1/xml/parse');
-                          setRequestBody('<?xml version="1.0"?>\n<!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>\n<foo>&xxe;</foo>');
-                          setActiveTab('request_builder');
-                        }}
-                      >
-                        Load Payload into Builder &rarr;
-                      </button>
-                    </div>
-                  )}
-
-                  {exerciseId === 'ex-nosql-01' && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0f172a', padding: '10px 14px', borderRadius: '6px', border: '1px solid #ef4444' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span className="tech-badge badge-amber" style={{ fontSize: '10px' }}>POST</span>
-                        <span className="mono" style={{ fontSize: '12px', color: '#f8fafc' }}>/api/v1/auth/login</span>
-                      </div>
-                      <button 
-                        className="tech-btn tech-btn-amber tech-btn-sm" 
-                        onClick={() => {
-                          setMethod('POST');
-                          setEndpoint('/api/v1/auth/login');
-                          setRequestBody('{\n  "username": "admin",\n  "password": {"$ne": null}\n}');
-                          setActiveTab('request_builder');
-                        }}
-                      >
-                        Load Payload into Builder &rarr;
-                      </button>
-                    </div>
-                  )}
-
-                  {exerciseId === 'ex-graphql-01' && (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#0f172a', padding: '10px 14px', borderRadius: '6px', border: '1px solid #ef4444' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span className="tech-badge badge-green" style={{ fontSize: '10px' }}>POST</span>
-                        <span className="mono" style={{ fontSize: '12px', color: '#f8fafc' }}>/graphql</span>
-                      </div>
-                      <button 
-                        className="tech-btn tech-btn-amber tech-btn-sm" 
-                        onClick={() => {
-                          setMethod('POST');
-                          setEndpoint('/graphql');
-                          setRequestBody('{\n  "query": "{ __schema { types { name } } }"\n}');
-                          setActiveTab('request_builder');
-                        }}
-                      >
-                        Load Payload into Builder &rarr;
-                      </button>
-                    </div>
-                  )}
-
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Authenticated profile</span>
                 </div>
-              </div>
 
-              {/* Target User Session Details */}
-              <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', padding: '16px' }}>
-                <div className="mono" style={{ fontSize: '11px', color: '#4ade80', fontWeight: '700', marginBottom: '8px' }}>
-                  // TARGET USER CREDENTIALS & TOKEN CONTEXT
-                </div>
-                <p style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: '1.5', margin: 0 }}>
-                  Logged in as <strong>{challenge.authenticated_user}</strong> (Role: Standard User). Target object parameter: <strong>{challenge.target_user}</strong>.
-                </p>
-              </div>
+                {exerciseId === 'ex-bfla-01' && (
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px 14px',
+                    backgroundColor: 'var(--status-danger-bg)',
+                    border: '1px solid var(--status-danger-border)',
+                    borderRadius: 'var(--radius-sm)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span className="tech-badge badge-red">DELETE</span>
+                      <span style={{ fontSize: '13px', fontFamily: 'var(--font-mono)' }}>/api/v1/users/carlos</span>
+                    </div>
+                    <button 
+                      className="tech-btn tech-btn-sm tech-btn-primary"
+                      onClick={() => {
+                        setMethod('DELETE');
+                        setEndpoint('/api/v1/users/carlos');
+                        setActiveTab('request_builder');
+                      }}
+                    >
+                      Load into Builder
+                    </button>
+                  </div>
+                )}
 
+                {exerciseId === 'ex-bola-01' && (
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px 14px',
+                    backgroundColor: 'var(--status-warning-bg)',
+                    border: '1px solid var(--status-warning-border)',
+                    borderRadius: 'var(--radius-sm)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span className="tech-badge badge-amber">GET</span>
+                      <span style={{ fontSize: '13px', fontFamily: 'var(--font-mono)' }}>/api/v1/invoices/INV-888</span>
+                    </div>
+                    <button 
+                      className="tech-btn tech-btn-sm tech-btn-primary"
+                      onClick={() => {
+                        setMethod('GET');
+                        setEndpoint('/api/v1/invoices/INV-888');
+                        setActiveTab('request_builder');
+                      }}
+                    >
+                      Load into Builder
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-
           </div>
         )}
 
-        {/* TAB 3: HTTP REQUEST BUILDER WORKSPACE */}
+        {/* TAB 3: HTTP REQUEST BUILDER */}
         {activeTab === 'request_builder' && (
-          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', height: '100%' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', height: '100%' }}>
             
-            {/* Left: Request Builder Panel */}
-            <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div className="mono" style={{ fontSize: '12px', color: '#38bdf8', fontWeight: '700' }}>
-                &gt;_ INTERACTIVE HTTP REQUEST BUILDER
+            {/* Left: Request Construction */}
+            <div className="tech-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                HTTP Request Builder
               </div>
 
-              {/* Method & Endpoint */}
               <div style={{ display: 'flex', gap: '8px' }}>
                 <select 
                   value={method}
                   onChange={(e) => setMethod(e.target.value)}
-                  className="mono"
-                  style={{ background: '#0f172a', color: '#4ade80', border: '1px solid #334155', borderRadius: '6px', padding: '10px', fontSize: '13px', fontWeight: '700', outline: 'none' }}
+                  style={{ width: '110px', fontWeight: '600', fontFamily: 'var(--font-mono)' }}
                 >
                   <option value="GET">GET</option>
                   <option value="POST">POST</option>
@@ -826,69 +584,60 @@ export default function ExercisePage({ navigate }) {
                   type="text" 
                   value={endpoint} 
                   onChange={(e) => setEndpoint(e.target.value)}
-                  className="mono"
-                  style={{ flex: 1, background: '#0f172a', color: '#ffffff', border: '1px solid #334155', borderRadius: '6px', padding: '10px 14px', fontSize: '12px', outline: 'none' }}
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}
                 />
 
                 <button 
+                  className="tech-btn tech-btn-primary"
                   onClick={handleSendRequest}
                   disabled={loading}
-                  style={{ background: '#ff9800', color: '#ffffff', border: 'none', borderRadius: '6px', padding: '10px 20px', fontWeight: '700', fontSize: '13px', cursor: 'pointer' }}
                 >
-                  {loading ? 'Sending...' : 'Send Request >'}
+                  {loading ? 'Sending...' : 'Send Request'}
                 </button>
               </div>
 
-              {/* Request Headers */}
               <div>
-                <label className="mono" style={{ fontSize: '10px', color: '#94a3b8', fontWeight: '700' }}>REQUEST HEADERS</label>
+                <label style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+                  Request Headers
+                </label>
                 <textarea 
                   value={requestHeaders}
                   onChange={(e) => setRequestHeaders(e.target.value)}
-                  className="mono"
-                  style={{ width: '100%', height: '70px', background: '#0f172a', border: '1px solid #334155', borderRadius: '6px', padding: '10px', color: '#94a3b8', fontSize: '11px', outline: 'none', resize: 'none', boxSizing: 'border-box' }}
+                  style={{ height: '70px', fontFamily: 'var(--font-mono)', fontSize: '11px', resize: 'none' }}
                 />
               </div>
 
-              {/* Request Body */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <label className="mono" style={{ fontSize: '10px', color: '#94a3b8', fontWeight: '700' }}>REQUEST BODY (JSON)</label>
+                <label style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
+                  JSON Payload Body
+                </label>
                 <textarea 
                   value={requestBody}
                   onChange={(e) => setRequestBody(e.target.value)}
-                  className="mono"
-                  style={{ width: '100%', flex: 1, minHeight: '160px', background: '#0f172a', border: '1px solid #334155', borderRadius: '6px', padding: '12px', color: '#4ade80', fontSize: '12px', outline: 'none', resize: 'none', boxSizing: 'border-box' }}
+                  style={{ flex: 1, minHeight: '140px', fontFamily: 'var(--font-mono)', fontSize: '12px', resize: 'none' }}
                 />
               </div>
             </div>
 
-            {/* Right: Response Output Panel */}
-            <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div className="mono" style={{ fontSize: '12px', color: '#38bdf8', fontWeight: '700' }}>
-                  &gt;_ TARGET CONTAINER HTTP RESPONSE
+            {/* Right: Response Telemetry */}
+            <div className="tech-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  Target Response Telemetry
                 </div>
                 {responseStatus && (
-                  <div className="mono" style={{
-                    fontSize: '11px',
-                    fontWeight: '800',
-                    padding: '4px 10px',
-                    borderRadius: '4px',
-                    background: responseStatus === 200 ? '#059669' : '#dc2626',
-                    color: '#ffffff'
-                  }}>
-                    STATUS: {responseStatus}
-                  </div>
+                  <span className={`tech-badge ${responseStatus === 200 ? 'badge-green' : 'badge-red'}`}>
+                    Status: {responseStatus}
+                  </span>
                 )}
               </div>
 
-              <pre className="mono" style={{
+              <pre style={{
                 flex: 1,
-                background: '#090d16',
-                border: '1px solid #334155',
-                borderRadius: '6px',
+                backgroundColor: 'var(--bg-surface-3)',
                 padding: '16px',
-                color: responseStatus === 200 ? '#34d399' : '#f8fafc',
+                borderRadius: 'var(--radius-sm)',
+                fontFamily: 'var(--font-mono)',
                 fontSize: '12px',
                 lineHeight: '1.5',
                 overflow: 'auto',
@@ -897,13 +646,16 @@ export default function ExercisePage({ navigate }) {
                 {responseOutput}
               </pre>
 
-              {/* Server-Side Verification Action Bar */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid #334155' }}>
-                <div style={{ fontSize: '12px', color: '#94a3b8' }}>
-                  Ready to test server-side objective state?
-                </div>
-                <button className="tech-btn tech-btn-amber" onClick={handleVerifyLab} disabled={loading}>
-                  <span>Validate Lab Objective &rarr;</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid var(--border-subtle)' }}>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                  Submit state to Oracle for verification check
+                </span>
+                <button 
+                  className="tech-btn tech-btn-sm tech-btn-secondary"
+                  onClick={handleVerifyLab}
+                  disabled={loading}
+                >
+                  Validate Objective
                 </button>
               </div>
             </div>
@@ -911,46 +663,56 @@ export default function ExercisePage({ navigate }) {
           </div>
         )}
 
-        {/* TAB 4: SERVER-SIDE VERIFICATION & ORACLE REPORT */}
+        {/* TAB 4: ORACLE VERIFICATION */}
         {activeTab === 'verification' && (
-          <div style={{ maxWidth: '800px', margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '32px' }}>
-              <div className="mono" style={{ fontSize: '12px', color: '#ff9800', fontWeight: '700', marginBottom: '12px' }}>
-                // SERVER-SIDE INDEPENDENT ORACLE EVALUATION
+          <div style={{ maxWidth: '680px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div className="tech-card">
+              <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase', marginBottom: '8px' }}>
+                Oracle Verification Engine
               </div>
-
-              <h3 style={{ fontSize: '20px', fontWeight: '800', color: '#ffffff', marginBottom: '16px' }}>
-                Automated Exploitation Verification
-              </h3>
-
-              <p style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: '1.6', marginBottom: '24px' }}>
-                The Oracle engine independently verifies your container state against objective criteria ({challenge.objective}).
+              <h2 style={{ fontSize: '20px', marginBottom: '12px' }}>
+                Ground-Truth Objective Verification
+              </h2>
+              <p style={{ fontSize: '13px', lineHeight: '1.6', marginBottom: '20px' }}>
+                The Oracle engine inspects target container database state mutations to verify exploitation.
               </p>
 
               {verificationResult ? (
                 <div style={{
-                  padding: '20px',
-                  borderRadius: '8px',
-                  background: verificationResult.verified ? 'rgba(5, 150, 105, 0.15)' : 'rgba(220, 38, 38, 0.15)',
-                  border: `1px solid ${verificationResult.verified ? '#059669' : '#dc2626'}`,
-                  marginBottom: '24px'
+                  padding: '16px',
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: verificationResult.verified ? 'var(--status-success-bg)' : 'var(--status-danger-bg)',
+                  border: `1px solid ${verificationResult.verified ? 'var(--status-success-border)' : 'var(--status-danger-border)'}`,
+                  marginBottom: '20px'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '16px', fontWeight: '800', color: verificationResult.verified ? '#34d399' : '#f87171', marginBottom: '8px' }}>
-                    <CheckCircle2 size={20} />
-                    <span>{verificationResult.verified ? 'VERIFICATION PASSED - 100/100 SCORE RECORDED!' : 'VERIFICATION FAILED'}</span>
+                  <div style={{ fontWeight: '600', color: verificationResult.verified ? 'var(--status-success)' : 'var(--status-danger)', marginBottom: '4px' }}>
+                    {verificationResult.verified ? 'Objective Verified (Score: 100/100)' : 'Verification Incomplete'}
                   </div>
-                  <p style={{ fontSize: '13px', color: '#f8fafc', lineHeight: '1.5' }}>
-                    {verificationResult.message || (verificationResult.verified ? 'Objective met successfully.' : 'Check target user state.')}
-                  </p>
+                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                    {verificationResult.message || (verificationResult.verified ? 'Target exploit confirmed.' : 'Target resource state unmutated.')}
+                  </div>
                 </div>
               ) : (
-                <div style={{ background: '#0f172a', border: '1px solid #334155', padding: '20px', borderRadius: '8px', marginBottom: '24px', textAlign: 'center', fontSize: '13px', color: '#94a3b8' }}>
-                  No verification submission evaluated yet. Execute a request via Request Builder and click Validate.
+                <div style={{
+                  padding: '16px',
+                  backgroundColor: 'var(--bg-surface-3)',
+                  borderRadius: 'var(--radius-sm)',
+                  textAlign: 'center',
+                  fontSize: '13px',
+                  color: 'var(--text-muted)',
+                  marginBottom: '20px'
+                }}>
+                  Execute a payload in the HTTP Request Builder and run verification.
                 </div>
               )}
 
-              <button className="tech-btn tech-btn-amber" style={{ width: '100%', justifyContent: 'center', padding: '14px' }} onClick={handleVerifyLab} disabled={loading}>
-                <span>{loading ? 'Evaluating Target State...' : 'Run Server-Side Verification Check'}</span>
+              <button 
+                className="tech-btn tech-btn-primary" 
+                style={{ width: '100%', padding: '12px' }}
+                onClick={handleVerifyLab}
+                disabled={loading}
+              >
+                {loading ? 'Evaluating container state...' : 'Run Oracle Verification Check'}
               </button>
             </div>
           </div>
@@ -958,52 +720,64 @@ export default function ExercisePage({ navigate }) {
 
       </main>
 
-      {/* STOP LAB MODAL */}
+      {/* STOP MODAL */}
       {showStopModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.7)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '28px', maxWidth: '440px', width: '100%', color: '#ffffff' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px' }}>Stop Lab Instance?</h3>
-            <p style={{ fontSize: '13px', color: '#cbd5e1', marginBottom: '24px', lineHeight: '1.5' }}>
-              Stopping the lab will save your current progress and safely recycle container resources. You can resume anytime.
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="tech-card" style={{ maxWidth: '400px', width: '100%', padding: '24px' }}>
+            <h3 style={{ fontSize: '16px', marginBottom: '8px' }}>Stop Lab Instance?</h3>
+            <p style={{ fontSize: '13px', marginBottom: '20px' }}>
+              Your progress will be preserved and container resources safely paused.
             </p>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button className="tech-btn tech-btn-secondary" style={{ background: '#0f172a', color: '#ffffff', border: '1px solid #334155' }} onClick={() => setShowStopModal(false)}>Cancel</button>
-              <button className="tech-btn tech-btn-amber" onClick={handleStopLab}>Stop & Return to Dashboard</button>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <button className="tech-btn tech-btn-secondary" onClick={() => setShowStopModal(false)}>Cancel</button>
+              <button className="tech-btn tech-btn-primary" onClick={handleStopLab}>Stop and Return</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* DELETE CONTAINER MODAL */}
+      {/* DELETE MODAL */}
       {showDeleteModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.7)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: '#1e293b', border: '1px solid #ef4444', borderRadius: '12px', padding: '28px', maxWidth: '440px', width: '100%', color: '#ffffff' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#f87171', marginBottom: '12px' }}>Delete Lab Container?</h3>
-            <p style={{ fontSize: '13px', color: '#cbd5e1', marginBottom: '24px', lineHeight: '1.5' }}>
-              This will destroy the active Docker container instance and clear your transient session state.
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="tech-card" style={{ maxWidth: '400px', width: '100%', padding: '24px' }}>
+            <h3 style={{ fontSize: '16px', color: 'var(--status-danger)', marginBottom: '8px' }}>Delete Container?</h3>
+            <p style={{ fontSize: '13px', marginBottom: '20px' }}>
+              This will destroy the active Docker container instance and clear transient session state.
             </p>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button className="tech-btn tech-btn-secondary" style={{ background: '#0f172a', color: '#ffffff', border: '1px solid #334155' }} onClick={() => setShowDeleteModal(false)}>Cancel</button>
-              <button className="tech-btn" style={{ background: '#ef4444', color: '#ffffff', border: 'none' }} onClick={handleDeleteContainer}>Delete Container Instance</button>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <button className="tech-btn tech-btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+              <button className="tech-btn" style={{ backgroundColor: 'var(--status-danger)', color: '#ffffff' }} onClick={handleDeleteContainer}>Delete Instance</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* LAB COMPLETED MODAL */}
+      {/* COMPLETE MODAL */}
       {showCompleteModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.85)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', border: '2px solid #059669', borderRadius: '16px', padding: '36px', maxWidth: '500px', width: '100%', color: '#ffffff', textAlign: 'center' }}>
-            <div style={{ background: '#059669', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#ffffff' }}>
-              <CheckCircle2 size={36} />
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="tech-card" style={{ maxWidth: '440px', width: '100%', padding: '32px', textAlign: 'center' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--status-success-bg)',
+              color: 'var(--status-success)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px auto',
+              fontSize: '20px',
+              fontWeight: '700'
+            }}>
+              ✓
             </div>
-            <h2 style={{ fontSize: '24px', fontWeight: '900', color: '#34d399', marginBottom: '8px' }}>LAB COMPLETED!</h2>
-            <p style={{ fontSize: '14px', color: '#cbd5e1', marginBottom: '24px' }}>
-              Congratulations! You successfully exploited <strong>{challenge.title}</strong> (100/100 points).
+            <h2 style={{ fontSize: '20px', marginBottom: '6px' }}>Exercise Completed</h2>
+            <p style={{ fontSize: '13px', marginBottom: '24px' }}>
+              Exploit verified successfully for <strong>{challenge.title}</strong> (100 pts).
             </p>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-              <button className="tech-btn tech-btn-secondary" style={{ background: '#0f172a', color: '#ffffff', border: '1px solid #334155' }} onClick={() => setShowCompleteModal(false)}>Review Workspace</button>
-              <button className="tech-btn tech-btn-amber" onClick={() => navigate('/dashboard')}>Return to Dashboard &rarr;</button>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button className="tech-btn tech-btn-secondary" onClick={() => setShowCompleteModal(false)}>Review Workspace</button>
+              <button className="tech-btn tech-btn-primary" onClick={() => navigate('/dashboard')}>Return to Dashboard</button>
             </div>
           </div>
         </div>

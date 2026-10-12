@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Award, ShieldCheck, ArrowRight, TrendingUp, CheckCircle2 } from 'lucide-react';
 import { assessmentApi } from '../services/api';
 
 export default function PostTestPage({ navigate }) {
@@ -44,92 +43,73 @@ export default function PostTestPage({ navigate }) {
   };
 
   return (
-    <div style={{ maxWidth: '840px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '40px' }}>
+    <div style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '28px' }}>
       
-      {/* Title Header */}
+      {/* Header */}
       <div>
-        <div className="mono" style={{ fontSize: '11px', color: 'var(--brand-orange)', fontWeight: '700', letterSpacing: '1px', marginBottom: '4px' }}>
-          // STEP 3 OF 5 • POST-TRAINING EVALUATION & KNOWLEDGE GAIN
+        <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px' }}>
+          Step 3 of 5 • Knowledge Gain Assessment
         </div>
-        <h1 style={{ fontSize: '30px', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.5px' }}>
+        <h1 style={{ fontSize: '32px', marginBottom: '8px' }}>
           Post-Test Conceptual Assessment
         </h1>
-        <p style={{ fontSize: '13px', color: '#64748b' }}>
-          Assess your post-training conceptual understanding using equivalent parallel questions to calculate your normalized learning gain.
+        <p style={{ fontSize: '14px', maxWidth: '640px' }}>
+          Parallel form evaluation assessing conceptual learning gain following your hands-on laboratory exercises.
         </p>
       </div>
 
-      {loading ? (
-        <div className="tech-card" style={{ padding: '32px', textAlign: 'center', color: '#64748b' }}>
-          Loading post-test questions...
-        </div>
-      ) : result ? (
-        /* Results View */
-        <div className="tech-card" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingBottom: '20px', borderBottom: '1px solid #e2e8f0' }}>
-            <div style={{ background: '#d1fae5', color: '#059669', width: '56px', height: '56px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Award size={32} />
-            </div>
-            <div>
-              <h2 style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a' }}>Post-Test Completed</h2>
-              <p style={{ fontSize: '13px', color: '#64748b' }}>Your post-training evaluation and knowledge gain have been calculated.</p>
-            </div>
+      {result ? (
+        <div className="tech-card" style={{ padding: '36px', textAlign: 'center' }}>
+          <div style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            backgroundColor: 'var(--status-success-bg)',
+            color: 'var(--status-success)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 16px auto',
+            fontSize: '22px',
+            fontWeight: '700'
+          }}>
+            ✓
           </div>
+          <h2 style={{ fontSize: '24px', marginBottom: '6px' }}>Post-Test Evaluation Complete</h2>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
+            Post-test score: <strong>{result.score_percentage || 0}%</strong> ({result.correct_count || 0} of {result.total_questions || 8} correct).
+          </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
-            <div style={{ background: '#f8fafc', padding: '16px', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-sm)', textAlign: 'center' }}>
-              <div className="mono" style={{ fontSize: '10px', color: '#94a3b8' }}>PRE-TEST SCORE</div>
-              <div style={{ fontSize: '22px', fontWeight: '800', color: '#64748b' }}>
-                {result.knowledge_gain?.pre_test_score !== undefined ? `${result.knowledge_gain.pre_test_score}%` : 'N/A'}
-              </div>
-            </div>
-
-            <div style={{ background: '#f8fafc', padding: '16px', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-sm)', textAlign: 'center' }}>
-              <div className="mono" style={{ fontSize: '10px', color: '#94a3b8' }}>POST-TEST SCORE</div>
-              <div style={{ fontSize: '22px', fontWeight: '900', color: '#0f172a' }}>
-                {result.score_percentage}%
-              </div>
-            </div>
-
-            <div style={{ background: '#f8fafc', padding: '16px', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-sm)', textAlign: 'center' }}>
-              <div className="mono" style={{ fontSize: '10px', color: '#94a3b8' }}>ABSOLUTE GAIN</div>
-              <div style={{ fontSize: '22px', fontWeight: '900', color: '#059669' }}>
-                +{result.knowledge_gain?.absolute_gain !== undefined ? result.knowledge_gain.absolute_gain : 0}%
-              </div>
-            </div>
-
-            <div style={{ background: '#f8fafc', padding: '16px', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-sm)', textAlign: 'center' }}>
-              <div className="mono" style={{ fontSize: '10px', color: '#94a3b8' }}>NORMALIZED GAIN (g)</div>
-              <div style={{ fontSize: '22px', fontWeight: '900', color: 'var(--brand-orange)' }}>
-                {result.knowledge_gain?.normalized_gain !== undefined ? result.knowledge_gain.normalized_gain : 0}
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
-            <button className="tech-btn tech-btn-secondary" onClick={() => navigate('/transfer')}>
-              <span>Go to Transfer Assessment</span>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+            <button 
+              className="tech-btn tech-btn-primary tech-btn-lg"
+              onClick={() => navigate('/assessment')}
+            >
+              Proceed to Step 4: Transfer Lab
             </button>
-            <button className="tech-btn tech-btn-primary" onClick={() => navigate('/usability')}>
-              <span>Proceed to Usability Survey</span>
-              <ArrowRight size={16} />
+            <button 
+              className="tech-btn tech-btn-secondary tech-btn-lg"
+              onClick={() => navigate('/dashboard')}
+            >
+              Return to Dashboard
             </button>
           </div>
         </div>
       ) : (
-        /* Questions Form */
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {questions.map((q, idx) => (
-            <div key={q.id} className="tech-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span className="tech-badge badge-cyan" style={{ fontSize: '11px' }}>QUESTION {idx + 1} OF {questions.length}</span>
-                <span className="mono" style={{ fontSize: '11px', color: '#64748b' }}>{q.category}</span>
+            <div key={q.id || idx} className="tech-card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <span className="tech-badge">Parallel Question {idx + 1} of {questions.length}</span>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{q.domain}</span>
               </div>
-              <h3 style={{ fontSize: '15px', fontWeight: '700', color: '#0f172a', lineHeight: '1.4' }}>{q.text}</h3>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '6px' }}>
-                {['A', 'B', 'C', 'D'].map(optKey => {
-                  const optionText = q[`option_${optKey.toLowerCase()}`];
+              <h3 style={{ fontSize: '15px', marginBottom: '14px', lineHeight: '1.4' }}>
+                {q.question_text}
+              </h3>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {q.options && Object.entries(q.options).map(([optKey, optText]) => {
                   const isSelected = answers[q.id] === optKey;
                   return (
                     <label 
@@ -139,25 +119,23 @@ export default function PostTestPage({ navigate }) {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '12px',
-                        padding: '12px 16px',
+                        padding: '10px 14px',
                         borderRadius: 'var(--radius-sm)',
-                        border: isSelected ? '2px solid var(--brand-navy)' : '1px solid #e2e8f0',
-                        background: isSelected ? '#fff7ed' : '#ffffff',
-                        cursor: 'pointer',
-                        fontSize: '13px',
-                        color: isSelected ? '#0f172a' : '#334155',
-                        fontWeight: isSelected ? '600' : '400',
-                        transition: 'all 0.15s ease'
+                        backgroundColor: isSelected ? 'var(--accent-subtle)' : 'var(--bg-surface-2)',
+                        border: isSelected ? '1px solid var(--border-focus)' : '1px solid var(--border-subtle)',
+                        cursor: 'pointer'
                       }}
                     >
                       <input 
-                        type="radio"
-                        name={`q_${q.id}`}
-                        checked={isSelected}
-                        onChange={() => {}}
-                        style={{ accentColor: 'var(--brand-orange)' }}
+                        type="radio" 
+                        name={`q-${q.id}`} 
+                        checked={isSelected} 
+                        onChange={() => {}} 
+                        style={{ width: 'auto' }}
                       />
-                      <span><strong>{optKey}.</strong> {optionText}</span>
+                      <span style={{ fontSize: '13px', color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                        <strong>{optKey.toUpperCase()}.</strong> {optText}
+                      </span>
                     </label>
                   );
                 })}
@@ -165,12 +143,14 @@ export default function PostTestPage({ navigate }) {
             </div>
           ))}
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
-            <button type="submit" className="tech-btn tech-btn-primary" disabled={submitting} style={{ padding: '12px 24px', fontSize: '14px' }}>
-              <span>{submitting ? 'Submitting Assessment...' : 'Submit Post-Test Assessment'}</span>
-              <ArrowRight size={16} />
-            </button>
-          </div>
+          <button 
+            type="submit" 
+            className="tech-btn tech-btn-primary tech-btn-lg" 
+            disabled={submitting || questions.length === 0}
+            style={{ width: '100%', marginTop: '12px' }}
+          >
+            {submitting ? 'Submitting Post-Test...' : 'Submit Post-Test & Calculate Gain'}
+          </button>
         </form>
       )}
 

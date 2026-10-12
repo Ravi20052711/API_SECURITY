@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import SecurityBanner from './components/SecurityBanner';
 import QwenFloatingAssistant from './components/QwenFloatingAssistant';
 
 import HomePage from './pages/HomePage';
@@ -105,19 +104,29 @@ export default function App() {
     }
   }, [basePath, isAuthenticated]);
 
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('app_theme') || 'enterprise';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('app_theme', theme);
+  }, [theme]);
+
   const isExerciseRoute = basePath === '/exercise' || currentPath.startsWith('/exercise');
+  const isAuthRoute = basePath === '/login' || basePath === '/signup' || basePath === '/reset-password';
 
   return (
     <ErrorBoundary>
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', overflow: isExerciseRoute ? 'hidden' : undefined }}>
         
-        {!isExerciseRoute && <SecurityBanner />}
-
-        {!isExerciseRoute && (
+        {!isExerciseRoute && !isAuthRoute && (
           <Navbar 
             currentPath={currentPath}
             navigate={navigate}
             currentUser={currentUser}
+            theme={theme}
+            setTheme={setTheme}
             setCurrentUser={(user) => {
               setCurrentUser(user);
               if (!user) {
@@ -129,8 +138,8 @@ export default function App() {
         )}
 
         <main 
-          className={isExerciseRoute ? "" : "main-container"} 
-          style={isExerciseRoute ? { width: '100vw', height: '100vh', maxWidth: '100%', margin: 0, padding: 0, flex: 1 } : { flex: 1 }}
+          className={isExerciseRoute || isAuthRoute ? "" : "main-container"} 
+          style={isExerciseRoute || isAuthRoute ? { width: '100vw', minHeight: '100vh', maxWidth: '100%', margin: 0, padding: 0, flex: 1, display: 'flex', flexDirection: 'column' } : { flex: 1 }}
         >
           {basePath === '/' && (
             isAuthenticated ? (
